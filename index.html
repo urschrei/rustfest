@@ -7,7 +7,8 @@
 		<title>reveal.js</title>
 
 		<link rel="stylesheet" href="css/reveal.css">
-		<link rel="stylesheet" href="css/theme/black.css">
+		<link rel="stylesheet" href="css/theme/white.css">
+		<link rel="stylesheet" href="css/custom.css">
 
 		<!-- Theme used for syntax highlighting of code -->
 		<link rel="stylesheet" href="lib/css/zenburn.css">
@@ -24,10 +25,127 @@
 	<body>
 		<div class="reveal">
 			<div class="slides">
-				<section>Slide 1</section>
-				<section>Slide 2</section>
+				<!-- <section>Slide 1</section> -->
+				<!-- <section>Slide 2</section> -->
+				<section data-markdown>
+			    <script type="text/template">
+				        ## Exploiting Ousterhout's Dichotomy for fast, convenient geocomputation
+
+				        <!-- A paragraph with some text and a [link](http://hakim.se). -->
+				        Stephan Hügel, UCL CASA
+				    </script>
+				</section>
+				<section data-markdown>
+			    <script type="text/template">
+				        ## About Me
+				        - 3rd year PhD student
+				        - I mostly work on smart cities – history, policy, future
+				        - Data analysis as productive procrastination
+				        - I like to measure things, and make them go fast
+
+				</script>
+				</section>
+				<!-- vertical example slides -->
+				<section>
+					<section data-markdown data-state='noborder'>
+				    <script type="text/template">
+					## Routing Engines
+					[![Routing](https://github.com/urschrei/router_comparison/raw/master/combined_gh.png)]()
+					</script>
+					</section>
+					<section data-markdown data-state='noborder'>
+				    <script type="text/template">
+					## Data Interpolation
+					[![Gridding](https://github.com/urschrei/Geopython/raw/master/data/rainfall_interpolation.gif)]()
+					</script>
+					</section>
+					<section data-markdown data-state='noborder'>
+				    <script type="text/template">
+					## Analysing Transforms
+					[![Transforms](https://raw.githubusercontent.com/urschrei/linalg/master/WLS.png)]()
+					</script>
+					</section>
+				</section>
+				<section data-markdown>
+			    <script type="text/template">
+				## How we do Geocomputation Now
+				- In a REPL
+					- RStudio
+					- IPython (Jupyter)
+					- Maybe Julia, eventually
+				
+				(this is how almost everyone in academia now does data analysis)
+				</script>
+				</section>
+				<section data-markdown data-state='noborder'>
+			    <script type="text/template">
+				## It's really, really good:
+				- Programs can be written as fragments
+				- Notebooks are easy to share
+				- Everything is Open Source
+				- Nobody has to write FORTRAN anymore (…)
+				[![Transforms](assets/fortran.jpg)]()
+				</script>
+				</section>
+				<section data-markdown>
+			    <script type="text/template">
+				## In Short:
+				## 🎉	
+				</script>
+				</section>
+				<section data-markdown data-state='noborder'>
+			    <script type="text/template">
+				## But All is not well in the Magic Kingdom
+				[![Transforms](assets/ice_king.png)]()
+				</script>
+				</section>
+				<section data-markdown>
+			    <script type="text/template">
+				## Interpreted Languages are Slow
+				## 🐢
+				</script>
+				</section>
+				<section data-markdown>
+			    <script type="text/template">
+				## How slow?
+				Difficult to measure accurately.
+
+				In general, 1 – 2 orders of magnitude slower than `C`.
+				</script>
+				</section>
+				<section data-markdown>
+			    <script type="text/template">
+				## Does this Matter?
+				It depends!
+
+				If it takes 2s to load your data, a 100x improvement is…irrelevant
+				</script>
+				</section>
+				<section data-markdown>
+			    <script type="text/template">
+				## But What about Big Data
+				(disclaimer: I do not know what Big Data are)
+
+				Let's flippantly define it along some axes:
+				- It takes "a while" to download (a while: one cup of coffee)
+				- It takes up a lot of room (> 1GB, let's say)
+				- Processing it doesn't feel "instant"
+
+				(NB: these axes are not orthogonal)
+				</script>
+				</section>
+				<section data-markdown>
+			    <script type="text/template">
+				## Geodata Have a Tendency to be Big
+				- Satellite imagery
+				- Shapefiles
+				- GeoJSON (the most convenient, least compact data format ever)
+				</script>
+				</section>
 			</div>
 		</div>
+
+
 
 		<script src="lib/js/head.min.js"></script>
 		<script src="js/reveal.js"></script>
