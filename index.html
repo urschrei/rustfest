@@ -8,7 +8,7 @@
 		<title>Glue</title>
 
 		<link rel="stylesheet" href="css/reveal.css">
-		<link rel="stylesheet" href="css/theme/white.css">
+		<link rel="stylesheet" href="css/theme/solarized.css">
 		<link rel="stylesheet" href="css/custom.css">
 
 		<!-- Theme used for syntax highlighting of code -->
@@ -150,10 +150,10 @@
 				<section data-markdown data-background-image="assets/landsat.jpg">
 			    <script type="text/template">
 				## Geodata Have a Tendency to be Medium
-				- Satellite imagery <!-- .element: class="fragment" data-fragment-index="1" -->
-				- Shapefiles <!-- .element: class="fragment" data-fragment-index="2" -->
-				- GeoJSON (the most convenient, least compact data format ever) <!-- .element: class="fragment" data-fragment-index="3" -->
-				- Waiting times can mount, especially when performing exploratory data analysis <!-- .element: class="fragment" data-fragment-index="3" -->
+				- Satellite imagery <!-- .element: class="fragment highlight-blue" data-fragment-index="1" -->
+				- Shapefiles <!-- .element: class="fragment highlight-blue" data-fragment-index="2" -->
+				- GeoJSON (the most convenient, least compact data format ever) <!-- .element: class="fragment highlight-blue" data-fragment-index="3" -->
+				- Waiting times can mount, especially when performing exploratory data analysis <!-- .element: class="fragment highlight-blue" data-fragment-index="4" -->
 				</script>
 				</section>
 				<section>
@@ -234,12 +234,17 @@
 						- Java: ant, maven, gradle, ivy, JVM
 						- C++: Boost, templates
 						- C: Everyone is bad at writing C
-					- It's easy to do things whose effects cannot be reasoned about <!-- .element: class="fragment" data-fragment-index="6" -->
-						- Undefined Behaviour in C
-						- Null pointer references, AKA "The Billion-Dollar Mistake"
-						- Double-freeing memory
-					- Language semantics are intimidating to beginning / casual programmers
 					</script>
+					</section>
+					<section data-markdown>
+					<script type="text/template">
+					## So, so hard
+					- It's easy to do things whose effects cannot be reasoned about <!-- .element: class="fragment" data-fragment-index="1" -->
+						- Undefined Behaviour in C <!-- .element: class="fragment" data-fragment-index="2" -->
+						- Null pointer references, AKA "The Billion-Dollar Mistake" <!-- .element: class="fragment" data-fragment-index="3" -->
+						- Double-freeing memory <!-- .element: class="fragment" data-fragment-index="4" -->
+					- Language semantics are intimidating to beginning / casual programmers <!-- .element: class="fragment" data-fragment-index="5" -->
+	                </script>
 					</section>
 				</section>
 				<section data-markdown>
@@ -431,7 +436,20 @@ fn convert_vec_direct<'a, F>(ex: &'a mut [f64],
 	        });
 	    }
 	});
+}
 ```
+					</script>
+					</section>
+					<section data-markdown>
+				    <script type="text/template">
+					## How to write Rust
+					1. go to `rustup.rs` and follow the 1-line installation instructions
+					2. In a terminal, type `cargo init myproject && cd myproject`
+					3. open `src/lib.rs` in your editor of choice
+					4. write some code, and a test (a skeleton is provided for you)
+					5. Switch to your terminal, and run `cargo test`
+					6. If your test passes, run `cargo build --release`
+					7. You now have an optimised dynamic library!
 					</script>
 					</section>
 				</section>
