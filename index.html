@@ -4,7 +4,7 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-		<title>reveal.js</title>
+		<title>Glue</title>
 
 		<link rel="stylesheet" href="css/reveal.css">
 		<link rel="stylesheet" href="css/theme/white.css">
@@ -75,6 +75,8 @@
 					- Maybe Julia, eventually
 				
 				(this is how almost everyone in academia now does data analysis)
+
+				(thanks Matlab)
 				</script>
 				</section>
 				<section data-markdown data-state='noborder'>
@@ -126,20 +128,298 @@
 				## But What about Big Data
 				(disclaimer: I do not know what Big Data are)
 
-				Let's flippantly define it along some axes:
-				- It takes "a while" to download (a while: one cup of coffee)
-				- It takes up a lot of room (> 1GB, let's say)
-				- Processing it doesn't feel "instant"
-
-				(NB: these axes are not orthogonal)
+				My working definition:
+				- You can't process them on a single machine
+				- Need tools like Hadoop / Apache Spark
+				- Not going to talk about Big Data, really
 				</script>
 				</section>
 				<section data-markdown>
 			    <script type="text/template">
-				## Geodata Have a Tendency to be Big
-				- Satellite imagery
-				- Shapefiles
-				- GeoJSON (the most convenient, least compact data format ever)
+				## Focus on "Medium" Data Instead
+
+				Let's flippantly define it along some axes:
+				- It takes "a while" to download (a while: one cup of coffee) <!-- .element: class="fragment" data-fragment-index="1" -->
+				- It takes up "a lot" of room (> 1GB, let's say) <!-- .element: class="fragment" data-fragment-index="2" -->
+				- Processing it doesn't feel "instant" <!-- .element: class="fragment" data-fragment-index="3" -->
+
+				(NB: these axes are not orthogonal) <!-- .element: class="fragment" data-fragment-index="4" -->
+				</script>
+				</section>
+				<section data-markdown data-background-video="assets/satellite.mp4" data-background-video-loop data-background-video-muted>
+			    <script type="text/template">
+				## Geodata Have a Tendency to be Medium
+				- Satellite imagery <!-- .element: class="fragment" data-fragment-index="1" -->
+				- Shapefiles <!-- .element: class="fragment" data-fragment-index="2" -->
+				- GeoJSON (the most convenient, least compact data format ever) <!-- .element: class="fragment" data-fragment-index="3" -->
+				- Waiting times can mount, especially when performing exploratory data analysis
+				</script>
+				</section>
+				<section>
+					<section data-markdown data-state='noborder'>
+				    <script type="text/template">
+					## How Can This be Mitigated?
+					✨Ousterhout's Dichotomy✨ <!-- .element: class="fragment" data-fragment-index="1" -->
+
+					[![Gridding](http://web.stanford.edu/~ouster/cgi-bin/Photo2008Small.jpg)]() <!-- .element: class="fragment" data-fragment-index="2" -->
+					</script>
+					</section>
+					<section data-markdown>
+				    <script type="text/template">
+					## What on Earth…?
+					</script>
+					</section>
+					<section data-markdown>
+				    <script type="text/template">
+					## Ousterhout's dichotomy
+					There are two kinds of programming languages:
+					- Systems programming languages <!-- .element: class="fragment" data-fragment-index="1" -->
+						- Statically Typed
+						- Support complex data structures
+						- Allow precise control over memory layout
+						- Compiled 
+					- Scripting, or "glue" languages <!-- .element: class="fragment" data-fragment-index="2" -->
+						- Dynamically Typed
+						- Little Provision for complex data structures
+						- Programs are interpreted
+					- The two interact via FFI (foreign function interface) <!-- .element: class="fragment" data-fragment-index="3" -->
+					</script>
+					</section>
+					<section data-markdown>
+				    <script type="text/template">
+					## Ousterhout's dichotomy
+					(The stuff about data structures is no longer true. Ignore it.)
+					</script>
+					</section>
+					<section data-markdown>
+				    <script type="text/template">
+					## Ousterhout's dichotomy
+					Some Examples:
+					- Systems programming languages <!-- .element: class="fragment" data-fragment-index="1" -->
+						- C
+						- C++
+						- FORTRAN
+					- Scripting, or "glue" languages <!-- .element: class="fragment" data-fragment-index="2" -->
+						- Python
+						- Ruby
+						- R
+						- Javascript (yes, you *can* use JS for geocomputation)
+					</script>
+					</section>
+					<section data-markdown>
+				    <script type="text/template">
+					## Ousterhout's dichotomy
+					This distinction is…imperfect at best. Consider:
+					- Java
+					- Lisp
+					- Other JVM languages (Clojure, Haskell)
+
+					…But it's still useful.
+					</script>
+					</section>
+					<section data-markdown>
+				    <script type="text/template">
+					## Ousterhout's dichotomy
+					Another (crucial) distinction:
+
+					Systems programming is really, really hard.<!-- .element: class="fragment" data-fragment-index="1" -->
+
+					- Static typing reduces up-front flexibility <!-- .element: class="fragment" data-fragment-index="2" -->
+					- Reasoning about pointers is difficult <!-- .element: class="fragment" data-fragment-index="3" -->
+						- But largely unavoidable in non-GC languages; that's how memory works `¯\_(ツ)_/¯`
+					- Toolchains are complex and arcane <!-- .element: class="fragment" data-fragment-index="4" -->
+						- (compilers, linkers, `make`, `autotools`)
+					- Languages are vast and/or arcane <!-- .element: class="fragment" data-fragment-index="5" -->
+						- Java: ant, maven, gradle, ivy, JVM
+						- C++: Boost, templates
+						- C: Everyone is bad at writing C
+					- It's easy to do things whose effects cannot be reasoned about <!-- .element: class="fragment" data-fragment-index="6" -->
+						- Undefined Behaviour in C
+						- Null pointer references, AKA "The Billion-Dollar Mistake"
+						- Double-freeing memory
+					- Language semantics are intimidating to beginning / casual programmers
+					</script>
+					</section>
+				</section>
+				<section data-markdown>
+				<script type="text/template">
+				## Can We Do Better?
+				Yes. Yes we can.
+                </script>
+				</section>
+				<section>
+					<section data-markdown data-state='noborder'>
+					<script type="text/template">
+					## Introducing Rust
+					A safe, concurrent, practical language. <!-- .element: class="fragment" data-fragment-index="1" -->
+
+					[![Rust](assets/rust.png)]() <!-- .element: class="fragment" data-fragment-index="2" -->
+
+					https://www.rust-lang.org/en-US/
+	                </script>
+					</section>
+					<section data-markdown data-state='noborder'>
+					<script type="text/template">
+					## What is Rust
+					- Fast (LLVM backend, runs as fast as C++) <!-- .element: class="fragment" data-fragment-index="1" -->
+					- Has modern language semantics, with zero runtime cost <!-- .element: class="fragment" data-fragment-index="2" -->
+						- Iteration <!-- .element: class="fragment" data-fragment-index="3" -->
+						- Type inference <!-- .element: class="fragment" data-fragment-index="4" -->
+						- Pattern matching <!-- .element: class="fragment" data-fragment-index="5" -->
+						- Algebraic Data Types <!-- .element: class="fragment" data-fragment-index="6" -->
+						- **Memory safety** <!-- .element: class="fragment" data-fragment-index="7" -->
+						- **Efficient C bindings** <!-- .element: class="fragment" data-fragment-index="8" -->
+	                </script>
+					</section>
+					<section data-markdown>
+					<script type="text/template">
+					What does any of that mean???
+
+					- Writing Rust often feels like writing Python / Ruby, due to familiar semantics <!-- .element: class="fragment" data-fragment-index="1" -->
+					- Rust goes to great lengths to make your code safe <!-- .element: class="fragment" data-fragment-index="2" -->
+						- Data races *cannot* exist in safe Rust (race conditions can, though)
+					- ADTs make it easy to express state machines and L-systems <!-- .element: class="fragment" data-fragment-index="3" -->
+					- Despite this, it's really, really fast: <!-- .element: class="fragment" data-fragment-index="4" -->
+						- Rust is *not* garbage-collected…
+							- But you don't have manage memory yourself…because
+	                </script>
+					</section>
+					<section data-markdown>
+					<script type="text/template">
+					- An ownership system keeps tracks of resources, and drops them automatically when they go out of scope
+					- Move semantics ensure that values are owned by a single reference, but can be borrowed by several
+
+					These things are statically checked at compile time; there's no run-time overhead
+	                </script>
+					</section>
+					<section data-markdown>
+					<script type="text/template">
+					## Is Everything Great?
+					No!
+					- The ownership system feels unfamiliar to…everyone
+					- "Fighting with the borrow checker" takes up a lot of your time at first
+					- The lack of a `NULL` type or `None` value can take some getting used to
+						- Rust has `Result` and `Option` types instead
+							- A `Result` holds either a value or an associated error
+							- an `Option` can be `Some(value)` or `None()`
+	                </script>
+					</section>
+					<section data-markdown>
+					<script type="text/template">
+					This is still a *vast* improvement.
+					- Rust has a single tool – `Cargo` – which manages builds, tests, and packages
+						- A Package is pretty much analogous to a Python package or a Ruby Gem
+	                </script>
+					</section>
+					<section data-markdown>
+					<script type="text/template">
+					## Rust's Most Innovative Feature
+					Community
+					- Inclusivity is an explicit goal of the Rust project
+					- Beginners are encouraged and supported
+					- Development is carried out in the open
+					- Decisions about the language are transparent
+
+					Systems programming isn't usually like this
+	                </script>
+					</section>
+				</section>
+				<section data-markdown>
+				<script type="text/template">
+```Rust
+
+
+```
+				</script>
+				</section>
+				<section>
+					<section data-markdown>
+				    <script type="text/template">
+					## Rust in the Real World
+					Implementing the OSTN02 transform:
+					1. 7-step Helmert Transform (WGS84 Lon, Lat ➡️ ETRS89 Eastings and Northings)
+					2. Retrieval of physically-measured correction parameters within a kilometer grid
+					3. Linear interpolation to determine precise corrections to apply
+					4. Addition of these produces the shift from the GRS80 to the Airy 1830 Ellipsoid
+
+					Step 2 is the slowest part of the process.
+					</script>
+					</section>
+					<section data-markdown>
+				    <script type="text/template">
+					## Rust in the Real World
+					<!-- .element: class="fragment" data-fragment-index="1" -->Introducing `lonlat_bng` and `convertbng` 
+					
+					<!-- .element: class="fragment" data-fragment-index="2" -->`lonlat_bng`: a Rust library implementing the OS OSTN02 transform 
+					
+					<!-- .element: class="fragment" data-fragment-index="3" -->`convertbng`: a Python package powered by `lonlat_bng`, available on OSX, Windows, and Linux, for Python 2.7, 3.5, and 3.5
+
+					`lonlat_bng` source: https://github.com/urschrei/lonlat_bng
+					`convertbng` source: https://github.com/urschrei/convertbng 
+					</script>
+					</section>
+					<section data-markdown>
+				    <script type="text/template">
+					## Rust in the Real World
+					- Installing `convertbng`
+						1. `pip install convertbng`
+						2. There is no step 2
+					- Using `lonlat_bng`
+						1. Get the dylib for your platform from https://github.com/urschrei/lonlat_bng/releases
+						2. Write some FFI glue code in your preferred language
+					</script>
+					</section>
+					<section data-markdown>
+				    <script type="text/template">
+					## Benchmarking `convertbng`
+					- Generate 10mm random WGS84 points within the GLA boundary <!-- .element: class="fragment" data-fragment-index="1" -->
+					- Convert them to OSGB36 <!-- .element: class="fragment" data-fragment-index="2" -->
+					</script>
+					</section>
+					<section data-markdown>
+				    <script type="text/template">
+					## Benchmarking `convertbng`
+					Methodology
+					- 4 Amazon EC2 C4 (compute-optimised) systems were tested
+					- The system was calibrated by taking the mean of 5 calibration runs of 1mm random numbers
+					- An identical benchmark program was then run for each of the 3 configurations
+					- The 5 slowest function calls for each benchmark were saved.
+					</script>
+					</section>
+					<section data-markdown>
+				    <script type="text/template">
+	## Results
+	| EC2 Instance Type    | Processors (vCPU) | Rust Ctypes (s) | Rust Cython (s) | Pyproj (s) | Ctypes vs Pyproj | Cython vs Pyproj |
+	|:---------------------|:-----------------:|:---------------:|:---------------:|:----------:|:----------------:|-----------------:|
+	| c4.xlarge            | 4                 | 23.075          | 21.964          |  18.73     |   23.39%         |  17.45%          |
+	| c4.2xlarge           | 8                 | 13.35           | 11.160          |  19.055    |  -29.93%         |  -41.43%         |
+	| c4.4xlarge           | 16                | 8.73            | 6.117           |  18.797    |  -53.55%         |  -67.45%         |
+	| c4.8xlarge           | 36                | 6.016           | 3.667           |  17.883    |  -66.35%         |  -79.49%         |
+					</script>
+					</section>
+					<section data-markdown>
+				    <script type="text/template">
+					## Benchmarks
+					On a 36-processor machine, we can convert 10mm points with better-than-millimeter accuracy, in **0.07s**
+
+					Pyproj can convert the same points in **0.3s**, and with only 5m accuracy.
+
+					Of course, Pyproj (and underlying it, PROJ.4) is single-threaded, and `convertbng` is multi-threaded
+
+					Which…is sort of my point:
+
+					Adding **safe**, concurrently-mutable multi-threading was around 30 lines of code.
+					</script>
+					</section>
+				</section>
+				<section data-markdown>
+			    <script type="text/template">
+				## What next for Geospatial Computing using Rust?
+				- Geo-rust exists
+				- Under active development
+					- Aims to provide a subset of geospatial primitives (GEOS), in the first instance
+					- 
+
 				</script>
 				</section>
 			</div>
