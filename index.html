@@ -3,7 +3,8 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
+		<meta name="description" content="An introduction to geospatial computing using Rust" />
+        <meta name="author" content="Stephan Hügel" />
 		<title>Glue</title>
 
 		<link rel="stylesheet" href="css/reveal.css">
@@ -11,7 +12,7 @@
 		<link rel="stylesheet" href="css/custom.css">
 
 		<!-- Theme used for syntax highlighting of code -->
-		<link rel="stylesheet" href="lib/css/zenburn.css">
+		<link rel="stylesheet" href="lib/css/solarized-dark.css">
 
 		<!-- Printing and PDF exports -->
 		<script>
@@ -98,7 +99,7 @@
 				<section data-markdown data-state='noborder'>
 			    <script type="text/template">
 				## But All is not well in the Magic Kingdom
-				[![Transforms](assets/ice_king.png)]()
+				[![Transforms](assets/ice_king.png)]() <!-- .element: class="fragment" data-fragment-index="1" -->
 				</script>
 				</section>
 				<section data-markdown>
@@ -139,20 +140,20 @@
 				## Focus on "Medium" Data Instead
 
 				Let's flippantly define it along some axes:
-				- It takes "a while" to download (a while: one cup of coffee) <!-- .element: class="fragment" data-fragment-index="1" -->
+				- It takes "a while" to download (a while: 1 x ☕️) <!-- .element: class="fragment" data-fragment-index="1" -->
 				- It takes up "a lot" of room (> 1GB, let's say) <!-- .element: class="fragment" data-fragment-index="2" -->
 				- Processing it doesn't feel "instant" <!-- .element: class="fragment" data-fragment-index="3" -->
 
 				(NB: these axes are not orthogonal) <!-- .element: class="fragment" data-fragment-index="4" -->
 				</script>
 				</section>
-				<section data-markdown data-background-video="assets/satellite.mp4" data-background-video-loop data-background-video-muted>
+				<section data-markdown data-background-image="assets/landsat.jpg">
 			    <script type="text/template">
 				## Geodata Have a Tendency to be Medium
 				- Satellite imagery <!-- .element: class="fragment" data-fragment-index="1" -->
 				- Shapefiles <!-- .element: class="fragment" data-fragment-index="2" -->
 				- GeoJSON (the most convenient, least compact data format ever) <!-- .element: class="fragment" data-fragment-index="3" -->
-				- Waiting times can mount, especially when performing exploratory data analysis
+				- Waiting times can mount, especially when performing exploratory data analysis <!-- .element: class="fragment" data-fragment-index="3" -->
 				</script>
 				</section>
 				<section>
@@ -296,7 +297,7 @@
 					<script type="text/template">
 					## Is Everything Great?
 					No!
-					- The ownership system feels unfamiliar to…everyone
+					- The ownership system initially feels unfamiliar to…everyone
 					- "Fighting with the borrow checker" takes up a lot of your time at first
 					- The lack of a `NULL` type or `None` value can take some getting used to
 						- Rust has `Result` and `Option` types instead
@@ -308,7 +309,10 @@
 					<script type="text/template">
 					This is still a *vast* improvement.
 					- Rust has a single tool – `Cargo` – which manages builds, tests, and packages
-						- A Package is pretty much analogous to a Python package or a Ruby Gem
+						- A Package is pretty much analogous to a Python / R package, or a Ruby Gem
+					- Rust's emphasis on correctness, and its highly expressive type system result in what's termed "fearless concurrency"
+					- Mutable shared access to data structures is neither difficult to implement, understand, or prone to error
+						- One example: Several threads all modifying values in a vector or array
 	                </script>
 					</section>
 					<section data-markdown>
@@ -324,13 +328,112 @@
 	                </script>
 					</section>
 				</section>
-				<section data-markdown>
-				<script type="text/template">
+				<section>
+					<section data-markdown>
+					<script type="text/template" class="nopad">
+## What does Rust look like?
 ```Rust
+fn square(elem: &i32) -> i32 {
+    elem.pow(2)
+}
 
-
+fn main() {
+    let v: Vec<i32> = vec![1, 2, 3];
+    let squared: Vec<i32> = v.iter().map(|elem| {
+    	square(elem)
+    }).collect();
+}
 ```
-				</script>
+					</script>
+					</section>
+					<section data-markdown>
+					<script type="text/template" class="nopad">
+## What does Rust look like?
+```Rust
+// Used to match against a zero or non-zero remainder
+enum Rem {
+    // No remainder
+    Zero,
+    // A remainder between 1 and 4
+    Other(NonZeroRem),
+}
+
+// Used to match a non-zero remainder
+enum NonZeroRem {
+    One,
+    Two,
+    Three,
+    Four,
+}
+
+// Easily allows us to exhaustively decide the return value
+// Input is the remainder of a modulo operation from a match expression
+fn int_to_rem(num: u8) -> Rem {
+    match num {
+        0 => Rem::Zero,
+        1 => Rem::Other(NonZeroRem::One),
+        2 => Rem::Other(NonZeroRem::Two),
+        3 => Rem::Other(NonZeroRem::Three),
+        4 => Rem::Other(NonZeroRem::Four),
+        _ => panic!("oops"),
+    }
+}
+
+fn main() {
+    for num in (1..101).collect::<Vec<u8>>() {
+        println!("{}",
+                 match (int_to_rem(num % 3), int_to_rem(num % 5)) {
+                     (Rem::Zero, Rem::Zero) => "FizzBuzz".to_string(),
+                     (Rem::Zero, Rem::Other(_)) => "Fizz".to_string(),
+                     (Rem::Other(_), Rem::Zero) => "Buzz".to_string(),
+                     (Rem::Other(_), Rem::Other(_)) => num.to_string(),
+                 })
+    }
+}
+```
+					</script>
+					</section>
+					<section data-markdown>
+					<script type="text/template" class="nopad">
+## What does Rust look like?
+```Rust
+// func is a conversion function which accepts two f64 inputs
+fn convert_vec_direct<'a, F>(ex: &'a mut [f64],
+                             ny: &'a mut [f64],
+                             func: F)
+                             -> (&'a mut [f64], &'a mut [f64])
+    where F: Fn(&f64, &f64) -> Result<(f64, f64), ()>+Send+Copy+Sync
+{
+    let numthreads = num_cpus::get() as usize;
+    let mut sz = ex.len() / numthreads;
+    if ex.len() % numthreads > 0 {
+        sz += 1;
+    }
+    sz = std::cmp::max(1, sz);
+	crossbeam::scope(|scope| {
+	    // chunks_mut returns chunks of "sz"
+	    // e.g. 20 items / 4 (numthreads) = 5, resulting in 4 chunks
+	    for (ex_ch, ny_ch) in ex.chunks_mut(sz).zip(ny.chunks_mut(sz)) {
+	        scope.spawn(move || {
+	            for (ex, ny) in ex_ch.iter_mut().zip(ny_ch.iter_mut()) {
+	                match func(ex, ny) {
+	                    // mutate values, or assign default error values
+	                    Ok(res) => {
+	                        *ex = res.0;
+	                        *ny = res.1;
+	                    }
+	                    Err(_) => {
+	                        *ex = NAN;
+	                        *ny = NAN;
+	                    }
+	                };
+	            }
+	        });
+	    }
+	});
+```
+					</script>
+					</section>
 				</section>
 				<section>
 					<section data-markdown>
@@ -372,7 +475,7 @@
 					<section data-markdown>
 				    <script type="text/template">
 					## Benchmarking `convertbng`
-					- Generate 10mm random WGS84 points within the GLA boundary <!-- .element: class="fragment" data-fragment-index="1" -->
+					- Generate 10m random WGS84 points within the GLA boundary <!-- .element: class="fragment" data-fragment-index="1" -->
 					- Convert them to OSGB36 <!-- .element: class="fragment" data-fragment-index="2" -->
 					</script>
 					</section>
@@ -381,9 +484,8 @@
 					## Benchmarking `convertbng`
 					Methodology
 					- 4 Amazon EC2 C4 (compute-optimised) systems were tested
-					- The system was calibrated by taking the mean of 5 calibration runs of 1mm random numbers
+					- The system was calibrated by taking the mean of 5 calibration runs of 1m random numbers
 					- An identical benchmark program was then run for each of the 3 configurations
-					- The 5 slowest function calls for each benchmark were saved.
 					</script>
 					</section>
 					<section data-markdown>
@@ -400,9 +502,9 @@
 					<section data-markdown>
 				    <script type="text/template">
 					## Benchmarks
-					On a 36-processor machine, we can convert 10mm points with better-than-millimeter accuracy, in **0.07s**
+					On a 36-processor machine, we can convert 10m points with better-than-millimeter accuracy, in **70ms**
 
-					Pyproj can convert the same points in **0.3s**, and with only 5m accuracy.
+					Pyproj can convert the same points in **300ms**, and with only 5 metre accuracy.
 
 					Of course, Pyproj (and underlying it, PROJ.4) is single-threaded, and `convertbng` is multi-threaded
 
@@ -417,24 +519,39 @@
 				## What next for Geospatial Computing using Rust?
 				- Geo-rust exists
 				- Under active development
-					- Aims to provide a subset of geospatial primitives (GEOS), in the first instance
-					- 
-
+					- Aims to provide a subset of geospatial primitives (think GEOS), in the first instance
+						- Point, LineString, Polygon types, and their Multi– versions
+						- Distance calculation algorithms, and predicates (`contains` etc.)
+						- Geometry simplification (RDP)
+				- Related libraries (GeoJSON, WKT, GPX, Geohash, Shapefile, Polyline) are all stable / under active development
+				- There aren't enough of us
+				</script>
+				</section>
+				<section data-markdown>
+			    <script type="text/template">
+				## Thanks! Questions?
+				- Me: @urschrei on Twitter
+				- Rust: http://rust-lang.org
+				- `convertbng`: https://github.com/convertbng
+				- `lonlat_bng`: https://github.com/lonlat_bng
+				- Rust-geo: https://github.com/georust/rust-geo
+				- Landsat 8 image © Charlie Loyd: https://www.flickr.com/photos/vruba/28549179875/
+				- **ADVENTURE TIME** and all related characters and elements are trademarks of and © Cartoon Network
 				</script>
 				</section>
 			</div>
 		</div>
-
-
-
 		<script src="lib/js/head.min.js"></script>
 		<script src="js/reveal.js"></script>
 
 		<script>
-			// More info about config & dependencies:
-			// - https://github.com/hakimel/reveal.js#configuration
-			// - https://github.com/hakimel/reveal.js#dependencies
+			// More info https://github.com/hakimel/reveal.js#configuration
 			Reveal.initialize({
+				history: true,
+				center: true,
+				transition: 'convex',
+
+				// More info https://github.com/hakimel/reveal.js#dependencies
 				dependencies: [
 					{ src: 'plugin/markdown/marked.js' },
 					{ src: 'plugin/markdown/markdown.js' },
