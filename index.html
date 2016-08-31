@@ -39,7 +39,7 @@
 				<section data-markdown>
 			    <script type="text/template">
 				        ## About Me
-				        - 3rd year PhD student
+				        - 4th year PhD student (I should be writing)
 				        - I mostly work on smart cities – history, policy, future
 				        - Data analysis as productive procrastination
 				        - I like to measure things, and make them go fast
@@ -398,7 +398,7 @@ fn main() {
 ```
 					</script>
 					</section>
-					<section data-markdown>
+					<section data-markdown id="crossbeam">
 					<script type="text/template" class="nopad">
 ## What does Rust look like?
 ```Rust
@@ -457,13 +457,41 @@ fn convert_vec_direct<'a, F>(ex: &'a mut [f64],
 					<section data-markdown>
 				    <script type="text/template">
 					## Rust in the Real World
-					Implementing the OSTN02 transform:
+					### Implementing the OSTN02 transform
+
+					OSTN02: a high-precision conversion from geographic WGS84 coordinates to projected OSGB36 coordinates
+
 					1. 7-step Helmert Transform (WGS84 Lon, Lat ➡️ ETRS89 Eastings and Northings)
 					2. Retrieval of physically-measured correction parameters within a kilometer grid
 					3. Linear interpolation to determine precise corrections to apply
 					4. Addition of these produces the shift from the GRS80 to the Airy 1830 Ellipsoid
 
 					Step 2 is the slowest part of the process.
+					</script>
+					</section>
+					<section data-markdown>
+				    <script type="text/template">
+					## Why OSTN02
+					- It's extremely well defined (thanks, Ordnance Survey!) <!-- .element: class="fragment" data-fragment-index="1" -->
+						- Detailed worked examples
+						- Test data is supplied
+					- It presents an interesting problem <!-- .element: class="fragment" data-fragment-index="2" -->
+						- How to store the surveyed corrections
+						- How to quickly retrieve them	
+					- Fundamental limit to the speed of some of the steps <!-- .element: class="fragment" data-fragment-index="3" -->
+						- The initial Helmert transform can only be made so fast
+						- Once a fast method has been found for retrieving the corrections, there's no more low-hanging fruit
+					</script>
+					</section>
+					<section data-markdown>
+				    <script type="text/template">
+					## What else could we do?
+					- Point transformations are calculated independently of one another <!-- .element: class="fragment" data-fragment-index="1" -->
+					- So, for a list (or vector, or array) of points, a multi-threading approach is ideal<!-- .element: class="fragment" data-fragment-index="2" -->
+					- it's embarassingly parallel <!-- .element: class="fragment" data-fragment-index="2" -->
+					- Rust is really, really good at this<!-- .element: class="fragment" data-fragment-index="3" -->
+						- It's easy to implement, and it's guaranteed to be memory-safe
+						- [It looks like this](index.html#/crossbeam)
 					</script>
 					</section>
 					<section data-markdown>
