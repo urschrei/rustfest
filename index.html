@@ -462,7 +462,7 @@ fn convert_vec_direct<'a, F>(ex: &'a mut [f64],
 					OSTN02: a high-precision conversion from geographic WGS84 coordinates to projected OSGB36 coordinates
 
 					1. 7-step Helmert Transform (WGS84 Lon, Lat ➡️ ETRS89 Eastings and Northings)
-					2. Retrieval of physically-measured correction parameters within a kilometer grid
+					2. Retrieval of precisely-calculated parameters within a kilometer grid
 					3. Linear interpolation to determine precise corrections to apply
 					4. Addition of these produces the shift from the GRS80 to the Airy 1830 Ellipsoid
 
@@ -477,7 +477,7 @@ fn convert_vec_direct<'a, F>(ex: &'a mut [f64],
 						- Test data is supplied
 					- It presents an interesting problem <!-- .element: class="fragment" data-fragment-index="2" -->
 						- How to store the surveyed corrections
-						- How to quickly retrieve them	
+						- How to quickly retrieve them (there are 2m grid shift parameters)
 					- Fundamental limit to the speed of some of the steps <!-- .element: class="fragment" data-fragment-index="3" -->
 						- The initial Helmert transform can only be made so fast
 						- Once a fast method has been found for retrieving the corrections, there's no more low-hanging fruit
@@ -580,6 +580,7 @@ fn convert_vec_direct<'a, F>(ex: &'a mut [f64],
 				- Rust: http://rust-lang.org
 				- `convertbng`: https://github.com/convertbng
 				- `lonlat_bng`: https://github.com/lonlat_bng
+				- OSTN02 Transform: 
 				- Rust-geo: https://github.com/georust/rust-geo
 				- Landsat 8 image © Charlie Loyd: https://www.flickr.com/photos/vruba/28549179875/
 				- **ADVENTURE TIME** and all related characters and elements are trademarks of and © Cartoon Network
