@@ -5,7 +5,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 		<meta name="description" content="An introduction to geospatial computing using Rust" />
         <meta name="author" content="Stephan Hügel" />
-		<title>Glue</title>
+		<title>Coordinate System</title>
 
 		<link rel="stylesheet" href="css/reveal.css">
 		<link rel="stylesheet" href="css/theme/solarized.css">
@@ -30,9 +30,7 @@
 				<!-- <section>Slide 2</section> -->
 				<section data-markdown>
 			    <script type="text/template">
-				        ## Exploiting Ousterhout's Dichotomy for fast, convenient geocomputation
-
-				        <!-- A paragraph with some text and a [link](http://hakim.se). -->
+				        ## Teaching Myself Rust via the medium of Coordinate System Transforms
 				        Stephan Hügel, UCL CASA
 				    </script>
 				</section>
@@ -40,23 +38,25 @@
 			    <script type="text/template">
 				        ## About Me
 				        - 4th year PhD student (I should be writing)
+				        	- English degree
+				        	- Master's in DH
 				        - I mostly work on smart cities – history, policy, future
-				        - Data analysis as productive procrastination
-				        - I like to measure things, and make them go fast
-
+				        - Programming is not my job
+					        - I do data analysis and visualisation as productive procrastination
+					        - Mostly work in Python (Pandas, NumPy, Matplotlib, Basemap)
 				</script>
 				</section>
 				<!-- vertical example slides -->
 				<section>
 					<section data-markdown data-state='noborder'>
 				    <script type="text/template">
-					## Routing Engines
+					## Data Analysis
 					[![Routing](https://github.com/urschrei/router_comparison/raw/master/combined_gh.png)]()
 					</script>
 					</section>
 					<section data-markdown data-state='noborder'>
 				    <script type="text/template">
-					## Data Interpolation
+					## Spatial Analysis
 					[![Gridding](https://github.com/urschrei/Geopython/raw/master/data/rainfall_interpolation.gif)]()
 					</script>
 					</section>
@@ -67,457 +67,209 @@
 					</script>
 					</section>
 				</section>
-				<section data-markdown>
-			    <script type="text/template">
-				## How we do Geocomputation Now
-				- In a REPL
-					- RStudio
-					- IPython (Jupyter)
-					- Maybe Julia, eventually
-				
-				(this is how almost everyone in academia now does data analysis)
 
-				(thanks Matlab)
-				</script>
-				</section>
-				<section data-markdown data-state='noborder'>
-			    <script type="text/template">
-				## It's really, really good:
-				- Programs can be written as fragments
-				- Notebooks are easy to share
-				- Everything is Open Source
-				- Nobody has to write FORTRAN anymore (…)
-				[![Transforms](assets/fortran.jpg)]()
-				</script>
-				</section>
-				<section data-markdown>
-			    <script type="text/template">
-				## In Short:
-				## 🎉	
-				</script>
-				</section>
-				<section data-markdown data-state='noborder'>
-			    <script type="text/template">
-				## But All is not well in the Magic Kingdom
-				[![Transforms](assets/ice_king.png)]() <!-- .element: class="fragment" data-fragment-index="1" -->
-				</script>
-				</section>
-				<section data-markdown>
-			    <script type="text/template">
-				## Interpreted Languages are Slow
-				## 🐢
-				</script>
-				</section>
-				<section data-markdown>
-			    <script type="text/template">
-				## How slow?
-				Difficult to measure accurately.
 
-				In general, 1 – 2 orders of magnitude slower than `C`.
-				</script>
-				</section>
-				<section data-markdown>
-			    <script type="text/template">
-				## Does this Matter?
-				It depends!
-
-				If it takes 2s to load your data, a 100x improvement is…irrelevant
-				</script>
-				</section>
-				<section data-markdown>
-			    <script type="text/template">
-				## But What about Big Data
-				(disclaimer: I do not know what Big Data are)
-
-				My working definition:
-				- You can't process them on a single machine
-				- Need tools like Hadoop / Apache Spark
-				- Not going to talk about Big Data, really
-				</script>
-				</section>
-				<section data-markdown>
-			    <script type="text/template">
-				## Focus on "Medium" Data Instead
-
-				Let's flippantly define it along some axes:
-				- It takes "a while" to download (a while: 1 x ☕️) <!-- .element: class="fragment" data-fragment-index="1" -->
-				- It takes up "a lot" of room (> 1GB, let's say) <!-- .element: class="fragment" data-fragment-index="2" -->
-				- Processing it doesn't feel "instant" <!-- .element: class="fragment" data-fragment-index="3" -->
-
-				(NB: these axes are not orthogonal) <!-- .element: class="fragment" data-fragment-index="4" -->
-				</script>
-				</section>
-				<section data-markdown data-state="alpha" data-background-image="assets/landsat.jpg">
-			    <script type="text/template">
-				## Geodata Have a Tendency to be Medium
-				- Satellite imagery <!-- .element: class="fragment highlight-red" data-fragment-index="1" -->
-				- Shapefiles <!-- .element: class="fragment highlight-red" data-fragment-index="2" -->
-				- GeoJSON (the most convenient, least compact data format ever) <!-- .element: class="fragment highlight-red" data-fragment-index="3" -->
-				- Waiting times can mount, especially when performing exploratory data analysis <!-- .element: class="fragment highlight-red" data-fragment-index="4" -->
-				</script>
-				</section>
 				<section>
 					<section data-markdown data-state='noborder'>
 				    <script type="text/template">
-					## How Can This be Mitigated?
-					✨Ousterhout's Dichotomy✨ <!-- .element: class="fragment" data-fragment-index="1" -->
+					        ## What is a coordinate system (CRS)
+					        - A way of describing locations on earth
+					        - Two components: the *datum*, and the *coordinate system*
 
-					[![Gridding](http://web.stanford.edu/~ouster/cgi-bin/Photo2008Small.jpg)]() <!-- .element: class="fragment" data-fragment-index="2" -->
-					</script>
-					</section>
-					<section data-markdown>
-				    <script type="text/template">
-					## What on Earth…?
-					</script>
-					</section>
-					<section data-markdown>
-				    <script type="text/template">
-					## Ousterhout's dichotomy
-					There are two kinds of programming languages:
-					- Systems programming languages <!-- .element: class="fragment" data-fragment-index="1" -->
-						- Statically Typed
-						- Support complex data structures
-						- Allow precise control over memory layout
-						- Compiled 
-					- Scripting, or "glue" languages <!-- .element: class="fragment" data-fragment-index="2" -->
-						- Dynamically Typed
-						- Little Provision for complex data structures
-						- Programs are interpreted
-					- The two interact via FFI (foreign function interface) <!-- .element: class="fragment" data-fragment-index="3" -->
-					</script>
-					</section>
-					<section data-markdown>
-				    <script type="text/template">
-					## Ousterhout's dichotomy
-					(The stuff about data structures is no longer true. Ignore it.)
-					</script>
-					</section>
-					<section data-markdown>
-				    <script type="text/template">
-					## Ousterhout's dichotomy
-					Some Examples:
-					- Systems programming languages <!-- .element: class="fragment" data-fragment-index="1" -->
-						- C
-						- C++
-						- FORTRAN
-					- Scripting, or "glue" languages <!-- .element: class="fragment" data-fragment-index="2" -->
-						- Python
-						- Ruby
-						- R
-						- Javascript (yes, you *can* use JS for geocomputation)
-					</script>
-					</section>
-					<section data-markdown>
-				    <script type="text/template">
-					## Ousterhout's dichotomy
-					This distinction is…imperfect at best. Consider:
-					- Java
-					- Lisp
-					- Other JVM languages (Clojure, Haskell)
+					        - **Datum**: describes how the CRS is related to the earth
+					        	- Position of the origin
+					        	- Scale
+					        	- **Surface**
+					        	- **Geoid**
 
-					…But it's still useful.
-					</script>
-					</section>
+					        - **Coordinate system**: describes how the coordinates are expressed
+					        	- Cartesian (x, y, z)
+					        	- Ellipsoidal ($\lambda, \mu, \nu$)
+					        	- Projected coordinates (UTM: 13.38891º E, 52.51690º N)
+				    </script>
+				    </section>
+				    <section data-markdown data-state='noborder'>
+				    <script type="text/template">
+					        ## WGS 84 
+					        - US-led, but now a global system
+					        - Datum specifies an origin at the centre of the earth
+					        - Uses the WGS 84 ellipsoid
+					        - Position within WGS 84 is determined using GPS
+					        - Designed to be globally consistent ±1m
+					        - ETRS89 is a high-accuracy "realisation" of WGS 84, used for surveying
+				    </script>
+				    </section>
+				    <section data-markdown data-state='noborder'>
+					Of course, the UK has no interest in these fripperies
+				    </script>
+				    </section>
+				    <section data-markdown data-state='noborder'>
+				    <script type="text/template">
+## The "National Grid"
+- Used on UK maps
+- Also used in Shape Files
+- Based on OSGB36 datum
+- Uses an ellipsoid known as **Airy 1830** 💨
+	- (It's actually named after Sir George Biddell Airy KCB PRS)
+    - It's a better fit for Britain than WGS 84, because it fits the local sea level more accurately 🌊
+- On maps, it uses Easting and Northing coordinates
+				    </script>
+				    </section>
+				    <section data-markdown data-state='noborder'>
+				    <script type="text/template">
+## Transforming Between Coordinate Systems
+### The Helmert Transform
+Datums can differ in three ways:
+
+1. Position of the origin of coordinates
+2. Orientation of the coordinate axes (and hence of the reference ellipsoid
+3. Size and shape of the reference ellipsoid
+				    </script>
+				    </section>
+				    <section data-markdown data-state='noborder'>
+				    <script type="text/template">
+## Transforming Between Coordinate Systems
+- If you work in 3D cartesian coordinates, you don't have to worry about (3)
+- It's straightforward to carry out this conversion
+- Just trust me on this
+				    </script>
+				    </section>
+				    <section data-markdown data-state='noborder'>
+				    <script type="text/template">
+## Transforming Between Coordinate Systems
+We use six parameters to describe the difference between two datums:
+- Three parameters to describe a 3D translation between the coordinate origins
+- Three parameters to describe a 3D rotation between the orientations of the coordinate axes.
+
+This can be expressed as a linear formula which assumes that the rotation parameters are ‘small’
+				    </script>
+				    </section>
+				    <section data-markdown data-state='noborder'>
+				    <script type="text/template">
+## omgmatrices
+$
+\begin{bmatrix}
+    x\\\
+    y\\\
+    z\\\
+\end{bmatrix}^B
+=
+\begin{bmatrix}
+    t_X\\\
+    t_Y\\\
+    t_Z\\\
+\end{bmatrix}
++
+\begin{bmatrix}
+    1+s  & -r_Z & r_Y\\\
+    r_Z  & 1+s  & -r_X\\\
+    -r_Y & r_X  & 1+s\\\
+\end{bmatrix}
+\cdot
+\begin{bmatrix}
+    x\\\
+    y\\\
+    z\\\
+\end{bmatrix}^A
+$
+Where:
+- $t_X$ ,$t_Y$ and $t_Z$ are the translations along the X, Y and Z axes respectively in metres,
+- $r_X$ , $r_Y$ and $r_Z$ are the rotations about the X, Y and Z axes respectively in radians
+- $s$ is the scale factor (unitless) minus one.
+
+(there are no more mathematical formulae in this talk, fyi)
+				    </script>
+				    </section>
+			    </section>
+			    <section>
+				    <section data-markdown data-state='noborder'>
+				    <script type="text/template">
+					        ## Implementing the transform – first steps
+				    </script>
+				    </section>
+				    <section data-markdown data-state='noborder'>
+				    <script type="text/template">
+					        ## Using Herbie to catch floating-point errors
+				    </script>
+				    </section>
+				    <section data-markdown data-state='noborder'>
+				    <script type="text/template">
+					        ## Single-threaded implementation
+				    </script>
+				    </section>
+				    <section data-markdown data-state='noborder'>
+				    <script type="text/template">
+					        ## Crossbeam!
+				    </script>
+				    </section>
+				    <section data-markdown data-state='noborder'>
+				    <script type="text/template">
+					        ## Comparing Crossbeam and Rayon
+				    </script>
+				    </section>
 					<section data-markdown>
 				    <script type="text/template">
-					## Ousterhout's dichotomy
-					Another (crucial) distinction:
+						### Implementing the OSTN02 / OSTN15 transform
 
-					Systems programming is really, really hard.<!-- .element: class="fragment" data-fragment-index="1" -->
+						`OSTN02` (now `15`): a high-precision conversion from geographic WGS84 coordinates to projected OSGB36 coordinates
 
-					- Static typing reduces up-front flexibility <!-- .element: class="fragment" data-fragment-index="2" -->
-					- Reasoning about pointers is difficult <!-- .element: class="fragment" data-fragment-index="3" -->
-						- But largely unavoidable in non-GC languages; that's how memory works `¯\_(ツ)_/¯`
-					- Toolchains are complex and arcane <!-- .element: class="fragment" data-fragment-index="4" -->
-						- (compilers, linkers, `make`, `autotools`)
-					- Languages are vast and/or arcane <!-- .element: class="fragment" data-fragment-index="5" -->
-						- Java: ant, maven, gradle, ivy, JVM
-						- C++: Boost, templates
-						- C: Everyone is bad at writing C
+						1. 7-step Helmert Transform (WGS84 Lon, Lat ➡️ ETRS89 Eastings and Northings)
+						2. Retrieval of precisely-calculated parameters within a kilometer grid
+						3. Linear interpolation to determine precise corrections to apply
+						4. Addition of these produces the shift from the GRS80 to the Airy 1830 Ellipsoid
+
+						Step 2 is the slowest part of the process.
 					</script>
 					</section>
-					<section data-markdown>
-					<script type="text/template">
-					## So, so hard
-					- It's easy to do things whose effects cannot be reasoned about <!-- .element: class="fragment" data-fragment-index="1" -->
-						- Undefined Behaviour in C <!-- .element: class="fragment" data-fragment-index="2" -->
-						- Null pointer references, AKA "The Billion-Dollar Mistake" <!-- .element: class="fragment" data-fragment-index="3" -->
-						- Double-freeing memory <!-- .element: class="fragment" data-fragment-index="4" -->
-					- Language semantics are intimidating to beginning / casual programmers <!-- .element: class="fragment" data-fragment-index="5" -->
-	                </script>
-					</section>
-				</section>
-				<section data-markdown>
-				<script type="text/template">
-				## Can We Do Better?
-				Yes. Yes we can.
-                </script>
-				</section>
+				    <section data-markdown data-state='noborder'>
+				    <script type="text/template">
+					        ## PHF
+				    </script>
+				    </section>
+				    <section data-markdown data-state='noborder'>
+				    <script type="text/template">
+					        ## Splitting Code into Modules
+				    </script>
+				    </section>
+			    </section>
+			    <section>
+				    <section data-markdown data-state='noborder'>
+				    <script type="text/template">
+					        ## Building Python Wheels
+				    </script>
+				    </section>
+				    <section data-markdown data-state='noborder'>
+				    <script type="text/template">
+					        ## What is `rpath`?!
+				    </script>
+				    </section>
+				    <section data-markdown data-state='noborder'>
+				    <script type="text/template">
+					        ## Using Rust-everywhere
+				    </script>
+				    </section>
+				    <section data-markdown data-state='noborder'>
+				    <script type="text/template">
+					        ## Difficulties and Gotchas
+				    </script>
+				    </section>
+				    <section data-markdown data-state='noborder'>
+				    <script type="text/template">
+					        ## `manylinux1`
+				    </script>
+				    </section>
+				    <section data-markdown data-state='noborder'>
+				    <script type="text/template">
+					        ## MinGWPy
+				    </script>
+				    </section>
+				    <section data-markdown data-state='noborder'>
+				    <script type="text/template">
+					        ## OSX
+				    </script>
+				    </section>
+			    </section>
 				<section>
-					<section data-markdown data-state='noborder'>
-					<script type="text/template">
-					## Introducing Rust
-					A safe, concurrent, practical language. <!-- .element: class="fragment" data-fragment-index="1" -->
-
-					[![Rust](assets/rust.png)]() <!-- .element: class="fragment" data-fragment-index="2" -->
-
-					https://www.rust-lang.org/en-US/
-	                </script>
-					</section>
-					<section data-markdown data-state='noborder'>
-					<script type="text/template">
-					## What is Rust
-					- Fast (LLVM backend, runs as fast as C++) <!-- .element: class="fragment" data-fragment-index="1" -->
-					- Has modern language semantics, with zero runtime cost <!-- .element: class="fragment" data-fragment-index="2" -->
-						- Iteration <!-- .element: class="fragment" data-fragment-index="3" -->
-						- Type inference <!-- .element: class="fragment" data-fragment-index="4" -->
-						- Pattern matching <!-- .element: class="fragment" data-fragment-index="5" -->
-						- Algebraic Data Types <!-- .element: class="fragment" data-fragment-index="6" -->
-						- **Memory safety** <!-- .element: class="fragment" data-fragment-index="7" -->
-						- **Efficient C bindings** <!-- .element: class="fragment" data-fragment-index="8" -->
-	                </script>
-					</section>
-					<section data-markdown>
-					<script type="text/template">
-					What does any of that mean???
-
-					- Writing Rust often feels like writing Python / Ruby, due to familiar semantics <!-- .element: class="fragment" data-fragment-index="1" -->
-					- Rust goes to great lengths to make your code safe <!-- .element: class="fragment" data-fragment-index="2" -->
-						- Data races *cannot* exist in safe Rust (race conditions can, though)
-					- ADTs make it easy to express state machines and L-systems <!-- .element: class="fragment" data-fragment-index="3" -->
-					- Despite this, it's really, really fast: <!-- .element: class="fragment" data-fragment-index="4" -->
-						- Rust is *not* garbage-collected…
-							- But you don't have manage memory yourself…because
-	                </script>
-					</section>
-					<section data-markdown>
-					<script type="text/template">
-					- An ownership system keeps tracks of resources, and drops them automatically when they go out of scope
-					- Move semantics ensure that values are owned by a single reference, but can be borrowed by several
-
-					These things are statically checked at compile time; there's no run-time overhead
-	                </script>
-					</section>
-					<section data-markdown>
-					<script type="text/template">
-					## Is Everything Great?
-					No!
-					- The ownership system initially feels unfamiliar to…everyone
-					- "Fighting with the borrow checker" takes up a lot of your time at first
-					- The lack of a `NULL` type or `None` value can take some getting used to
-						- Rust has `Result` and `Option` types instead
-							- A `Result` holds either a value or an associated error
-							- an `Option` can be `Some(value)` or `None()`
-	                </script>
-					</section>
-					<section data-markdown>
-					<script type="text/template">
-					This is still a *vast* improvement.
-					- Rust has a single tool – `Cargo` – which manages builds, tests, and packages
-						- A Package is pretty much analogous to a Python / R package, or a Ruby Gem
-					- Rust's emphasis on correctness, and its highly expressive type system result in what's termed "fearless concurrency"
-					- Mutable shared access to data structures is neither difficult to implement, understand, or prone to error
-						- One example: Several threads all modifying values in a vector or array
-	                </script>
-					</section>
-					<section data-markdown>
-					<script type="text/template">
-					## Rust's Most Innovative Feature
-					Community
-					- Inclusivity is an explicit goal of the Rust project
-					- Beginners are encouraged and supported
-					- Development is carried out in the open
-					- Decisions about the language are transparent
-
-					Systems programming isn't usually like this
-	                </script>
-					</section>
-				</section>
-				<section>
-					<section data-markdown>
-					<script type="text/template" class="nopad">
-## What does Rust look like?
-```Rust
-fn square(elem: &i32) -> i32 {
-    elem.pow(2)
-}
-
-fn main() {
-    let v: Vec<i32> = vec![1, 2, 3];
-    let squared: Vec<i32> = v.iter().map(|elem| {
-    	square(elem)
-    }).collect();
-}
-```
-					</script>
-					</section>
-					<section data-markdown>
-					<script type="text/template" class="nopad">
-## What does Rust look like?
-```Rust
-// Used to match against a zero or non-zero remainder
-enum Rem {
-    // No remainder
-    Zero,
-    // A remainder between 1 and 4
-    Other(NonZeroRem),
-}
-
-// Used to match a non-zero remainder
-enum NonZeroRem {
-    One,
-    Two,
-    Three,
-    Four,
-}
-
-// Easily allows us to exhaustively decide the return value
-// Input is the remainder of a modulo operation from a match expression
-fn int_to_rem(num: u8) -> Rem {
-    match num {
-        0 => Rem::Zero,
-        1 => Rem::Other(NonZeroRem::One),
-        2 => Rem::Other(NonZeroRem::Two),
-        3 => Rem::Other(NonZeroRem::Three),
-        4 => Rem::Other(NonZeroRem::Four),
-        _ => panic!("oops"),
-    }
-}
-
-fn main() {
-    for num in (1..101).collect::<Vec<u8>>() {
-        println!("{}",
-                 match (int_to_rem(num % 3), int_to_rem(num % 5)) {
-                     (Rem::Zero, Rem::Zero) => "FizzBuzz".to_string(),
-                     (Rem::Zero, Rem::Other(_)) => "Fizz".to_string(),
-                     (Rem::Other(_), Rem::Zero) => "Buzz".to_string(),
-                     (Rem::Other(_), Rem::Other(_)) => num.to_string(),
-                 })
-    }
-}
-```
-					</script>
-					</section>
-					<section data-markdown id="crossbeam">
-					<script type="text/template" class="nopad">
-## What does Rust look like?
-```Rust
-// func is a conversion function which accepts two f64 inputs
-fn convert_vec_direct<'a, F>(ex: &'a mut [f64],
-                             ny: &'a mut [f64],
-                             func: F)
-                             -> (&'a mut [f64], &'a mut [f64])
-    where F: Fn(&f64, &f64) -> Result<(f64, f64), ()>+Send+Copy+Sync
-{
-    let numthreads = num_cpus::get() as usize;
-    let mut sz = ex.len() / numthreads;
-    if ex.len() % numthreads > 0 {
-        sz += 1;
-    }
-    sz = std::cmp::max(1, sz);
-	crossbeam::scope(|scope| {
-	    // chunks_mut returns chunks of "sz"
-	    // e.g. 20 items / 4 (numthreads) = 5, resulting in 4 chunks
-	    for (ex_ch, ny_ch) in ex.chunks_mut(sz).zip(ny.chunks_mut(sz)) {
-	        scope.spawn(move || {
-	            for (ex, ny) in ex_ch.iter_mut().zip(ny_ch.iter_mut()) {
-	                match func(ex, ny) {
-	                    // mutate values, or assign default error values
-	                    Ok(res) => {
-	                        *ex = res.0;
-	                        *ny = res.1;
-	                    }
-	                    Err(_) => {
-	                        *ex = NAN;
-	                        *ny = NAN;
-	                    }
-	                };
-	            }
-	        });
-	    }
-	});
-}
-```
-					</script>
-					</section>
-					<section data-markdown>
-				    <script type="text/template">
-					## How to write Rust
-					1. go to `rustup.rs` and follow the 1-line installation instructions
-					2. In a terminal, type `cargo init myproject && cd myproject`
-					3. open `src/lib.rs` in your editor of choice
-					4. write some code, and a test (a skeleton is provided for you)
-					5. Switch to your terminal, and run `cargo test`
-					6. If your test passes, run `cargo build --release`
-					7. You now have an optimised dynamic library!
-					</script>
-					</section>
-				</section>
-				<section>
-					<section data-markdown>
-				    <script type="text/template">
-					## Rust in the Real World
-					### Implementing the OSTN02 transform
-
-					OSTN02: a high-precision conversion from geographic WGS84 coordinates to projected OSGB36 coordinates
-
-					1. 7-step Helmert Transform (WGS84 Lon, Lat ➡️ ETRS89 Eastings and Northings)
-					2. Retrieval of precisely-calculated parameters within a kilometer grid
-					3. Linear interpolation to determine precise corrections to apply
-					4. Addition of these produces the shift from the GRS80 to the Airy 1830 Ellipsoid
-
-					Step 2 is the slowest part of the process.
-					</script>
-					</section>
-					<section data-markdown>
-				    <script type="text/template">
-					## Why OSTN02
-					- It's extremely well defined (thanks, Ordnance Survey!) <!-- .element: class="fragment" data-fragment-index="1" -->
-						- Detailed worked examples
-						- Test data is supplied
-					- It presents an interesting problem <!-- .element: class="fragment" data-fragment-index="2" -->
-						- How to store the surveyed corrections
-						- How to quickly retrieve them (there are 2m grid shift parameters)
-					- Fundamental limit to the speed of some of the steps <!-- .element: class="fragment" data-fragment-index="3" -->
-						- The initial Helmert transform can only be made so fast
-						- Once a fast method has been found for retrieving the corrections, there's no more low-hanging fruit
-					</script>
-					</section>
-					<section data-markdown>
-				    <script type="text/template">
-					## What else could we do?
-					- Point transformations are calculated independently of one another <!-- .element: class="fragment" data-fragment-index="1" -->
-					- So, for a list (or vector, or array) of points, a multi-threading approach is ideal<!-- .element: class="fragment" data-fragment-index="2" -->
-					- it's embarassingly parallel <!-- .element: class="fragment" data-fragment-index="2" -->
-					- Rust is really, really good at this<!-- .element: class="fragment" data-fragment-index="3" -->
-						- It's easy to implement, and it's guaranteed to be memory-safe
-						- [It looks like this](index.html#/crossbeam)
-					</script>
-					</section>
-					<section data-markdown>
-				    <script type="text/template">
-					## Rust in the Real World
-					<!-- .element: class="fragment" data-fragment-index="1" -->Introducing `lonlat_bng` and `convertbng` 
-					
-					<!-- .element: class="fragment" data-fragment-index="2" -->`lonlat_bng`: a Rust library implementing the OS OSTN02 transform 
-					
-					<!-- .element: class="fragment" data-fragment-index="3" -->`convertbng`: a Python package powered by `lonlat_bng`, available on OSX, Windows, and Linux, for Python 2.7, 3.5, and 3.5
-
-					`lonlat_bng` source: https://github.com/urschrei/lonlat_bng
-					`convertbng` source: https://github.com/urschrei/convertbng 
-					</script>
-					</section>
-					<section data-markdown>
-				    <script type="text/template">
-					## Rust in the Real World
-					- Installing `convertbng`
-						1. `pip install convertbng`
-						2. There is no step 2
-					- Using `lonlat_bng`
-						1. Get the dylib for your platform from https://github.com/urschrei/lonlat_bng/releases
-						2. Write some FFI glue code in your preferred language
-					</script>
-					</section>
 					<section data-markdown>
 				    <script type="text/template">
 					## Benchmarking `convertbng`
@@ -537,26 +289,13 @@ fn convert_vec_direct<'a, F>(ex: &'a mut [f64],
 					<section data-markdown>
 				    <script type="text/template">
 	## Results
-	| EC2 Instance Type    | Processors (vCPU) | Rust Ctypes (s) | Rust Cython (s) | Pyproj (s) | Ctypes vs Pyproj | Cython vs Pyproj |
-	|:---------------------|:-----------------:|:---------------:|:---------------:|:----------:|:----------------:|-----------------:|
-	| c4.xlarge            | 4                 | 23.075          | 21.964          |  18.73     |   23.39%         |  17.45%          |
-	| c4.2xlarge           | 8                 | 13.35           | 11.160          |  19.055    |  -29.93%         |  -41.43%         |
-	| c4.4xlarge           | 16                | 8.73            | 6.117           |  18.797    |  -53.55%         |  -67.45%         |
-	| c4.8xlarge           | 36                | 6.016           | 3.667           |  17.883    |  -66.35%         |  -79.49%         |
-					</script>
-					</section>
-					<section data-markdown>
-				    <script type="text/template">
-					## Benchmarks
-					On a 36-processor machine, we can convert 10m points with better-than-millimeter accuracy, in **70ms**
+| EC2 Instance Type    | Processors (vCPU) | Rust Ctypes (s) | Rust Cython (s) | Pyproj (s) | Ctypes vs Pyproj | Cython vs Pyproj |
+|:----------|:----------:|:----------:|:----------:|:----------:|:----------:|----------:|
+| c4.xlarge            | 4                 | 14.432          | 12.114          |  18.358    |  -21.38%         |  -34.01%         |
+| c4.2xlarge           | 8                 | 8.699           | 6.417           |  18.03     |  -52.46%         |  -64.97%         |
+| c4.4xlarge           | 16                | 6.470           | 3.716           |  18.561    |  -65.14%         |  -79.97%         |
+| c4.8xlarge           | 36                | 4.913           | 2.501           |  17.965    |  -72.652%        |  -86.07%         |
 
-					Pyproj can convert the same points in **300ms**, and with only 5 metre accuracy.
-
-					Of course, Pyproj (and underlying it, PROJ.4) is single-threaded, and `convertbng` is multi-threaded
-
-					Which…is sort of my point:
-
-					Adding **safe**, concurrently-mutable multi-threading was around 30 lines of code.
 					</script>
 					</section>
 				</section>
@@ -581,8 +320,6 @@ fn convert_vec_direct<'a, F>(ex: &'a mut [f64],
 				- `convertbng`: https://github.com/convertbng
 				- `lonlat_bng`: https://github.com/lonlat_bng
 				- Rust-geo: https://github.com/georust/rust-geo
-				- Landsat 8 image © Charlie Loyd: https://www.flickr.com/photos/vruba/28549179875/
-				- **ADVENTURE TIME** and all related characters and elements are trademarks of and © Cartoon Network
 				</script>
 				</section>
 			</div>
@@ -596,9 +333,14 @@ fn convert_vec_direct<'a, F>(ex: &'a mut [f64],
 				history: true,
 				center: true,
 				transition: 'convex',
+			    math: {
+			        mathjax: 'https://cdn.mathjax.org/mathjax/latest/MathJax.js',
+			        config: 'TeX-AMS-MML_HTMLorMML'  // See http://docs.mathjax.org/en/latest/config-files.html
+			    },
 
 				// More info https://github.com/hakimel/reveal.js#dependencies
 				dependencies: [
+					{ src: 'plugin/math/math.js', async: true },
 					{ src: 'plugin/markdown/marked.js' },
 					{ src: 'plugin/markdown/markdown.js' },
 					{ src: 'plugin/notes/notes.js', async: true },
