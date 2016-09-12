@@ -238,12 +238,76 @@ Each adjustment is a set of three floating-point values.
 				    </section>
 				    <section data-markdown data-state='noborder'>
 				    <script type="text/template">
-					        ## Crossbeam!
+					        ## Comparing Crossbeam and Rayon
 				    </script>
+				    </section>
+					<section data-markdown data-state='noborder'>
+				    <script type="text/template">
+## Crossbeam
+```rust
+fn convert_vec_direct<'a, F>(ex: &'a mut [f64],
+                             ny: &'a mut [f64],
+                             func: F)
+                             -> (&'a mut [f64], &'a mut [f64])
+    where F: Fn(&f64, &f64) -> Result<(f64, f64), ()> + Send + Copy + Sync
+{
+    let numthreads = num_cpus::get() as usize;
+    let mut size = ex.len() / numthreads;
+    if ex.len() % numthreads > 0 {
+        size += 1;
+    }
+    size = std::cmp::max(1, size);
+    crossbeam::scope(|scope| {
+        // chunks_mut returns chunks of "size"
+        for (ex_ch, ny_ch) in ex.chunks_mut(size).zip(ny.chunks_mut(size)) {
+            scope.spawn(move || {
+                for (ex, ny) in ex_ch.iter_mut().zip(ny_ch.iter_mut()) {
+                    match func(ex, ny) {
+                        // mutate values, or assign default error values
+                        Ok(res) => {
+                            *ex = res.0;
+                            *ny = res.1;
+                        }
+                        Err(_) => {
+                            *ex = NAN;
+                            *ny = NAN;
+                        }
+                    };
+                }
+            });
+        }
+    });
+    (ex, ny)
+}
+```
+					</script>
 				    </section>
 				    <section data-markdown data-state='noborder'>
 				    <script type="text/template">
-					        ## Comparing Crossbeam and Rayon
+## Rayon
+```rust
+fn convert_vec_direct<'a, F>(ex: &'a mut [f64],
+                             ny: &'a mut [f64],
+                             func: F)
+                             -> (&'a mut [f64], &'a mut [f64])
+    where F: Fn(&f64, &f64) -> Result<(f64, f64), ()> + Send + Copy + Sync
+{
+    ex.par_iter_mut().zip(ny.par_iter_mut()).for_each(|p| {
+        match func(p.0, p.1) {
+            // mutate values, or assign default error values
+            Ok(res) => {
+                *p.0 = res.0;
+                *p.1 = res.1;
+            }
+            Err(_) => {
+                *p.0 = NAN;
+                *p.1 = NAN;
+            }
+        }
+    });
+    (ex, ny)
+}
+```
 				    </script>
 				    </section>
 					<section data-markdown>
