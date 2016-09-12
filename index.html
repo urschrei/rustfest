@@ -177,19 +177,58 @@ Where:
 - $r_X$ , $r_Y$ and $r_Z$ are the rotations about the X, Y and Z axes respectively in radians
 - $s$ is the scale factor (unitless) minus one.
 
-(there are no more mathematical formulae in this talk, fyi)
+(there are no more mathematical formulæ in this talk, fyi)
 				    </script>
 				    </section>
 			    </section>
 			    <section>
 				    <section data-markdown data-state='noborder'>
 				    <script type="text/template">
-					        ## Implementing the transform – first steps
+					        ## So we're done here?
+					        Well, no.
+					        …the Helmert transform introduces error up to 3m in plan.  
+					        (we're not really worried about height)  
+
+					        This is OK, but no use for accurate applications like surveying.
+					        These demand transformations accurate to around 1.1mm
 				    </script>
 				    </section>
 				    <section data-markdown data-state='noborder'>
 				    <script type="text/template">
-					        ## Using Herbie to catch floating-point errors
+## UK Ordnance Survey Has Got This
+### The OSTN02™ and OSTN15™ transforms
+- "Rubber-sheet" transforms
+- Use a file of grid shift parameters with 1km resolution
+- Bilinear interpolation to get precise adjustments
+				    </script>
+				    </section>
+				    <section data-markdown data-state='noborder'>
+				    <script type="text/template">
+						### Implementing the OSTN02™ / OSTN15™ transform
+
+						1. 7-step Helmert Transform (WGS84 Lon, Lat ➡️ ETRS89 Eastings and Northings)
+						2. Retrieval of precisely-calculated parameters within a kilometer grid
+						3. Bilinear interpolation to determine precise corrections to apply
+						4. Addition of these produces the shift from the GRS80 to the Airy 1830 Ellipsoid
+				    </script>
+				    </section>
+				    <section data-markdown data-state='noborder'>
+				    <script type="text/template">
+					        ## Implementing the Helmert transform – first steps
+					        Not going to go into much detail, because it's quite boring?
+					        `conversions.rs`, L284–373
+				    </script>
+				    </section>
+				    <section data-markdown data-state='noborder'>
+				    <script type="text/template">
+### Integrating the adjustments
+There's just one problem: there are 876,951 adjustments.
+Each adjustment is a set of three floating-point values.
+				    </script>
+				    </section>
+				    <section data-markdown data-state='noborder'>
+				    <script type="text/template">
+					        ## PHF
 				    </script>
 				    </section>
 				    <section data-markdown data-state='noborder'>
@@ -209,23 +248,8 @@ Where:
 				    </section>
 					<section data-markdown>
 				    <script type="text/template">
-						### Implementing the OSTN02 / OSTN15 transform
-
-						`OSTN02` (now `15`): a high-precision conversion from geographic WGS84 coordinates to projected OSGB36 coordinates
-
-						1. 7-step Helmert Transform (WGS84 Lon, Lat ➡️ ETRS89 Eastings and Northings)
-						2. Retrieval of precisely-calculated parameters within a kilometer grid
-						3. Linear interpolation to determine precise corrections to apply
-						4. Addition of these produces the shift from the GRS80 to the Airy 1830 Ellipsoid
-
-						Step 2 is the slowest part of the process.
 					</script>
 					</section>
-				    <section data-markdown data-state='noborder'>
-				    <script type="text/template">
-					        ## PHF
-				    </script>
-				    </section>
 				    <section data-markdown data-state='noborder'>
 				    <script type="text/template">
 					        ## Splitting Code into Modules
