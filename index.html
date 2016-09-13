@@ -44,6 +44,7 @@
 				        - Programming is not my job
 					        - I do data analysis and visualisation as productive procrastination
 					        - Mostly work in Python (Pandas, NumPy, Matplotlib, Basemap)
+					        - I use a lot of maps of parts of the UK
 				</script>
 				</section>
 				<!-- vertical example slides -->
@@ -221,7 +222,7 @@ Where:
 			    <section>
 				    <section data-markdown data-state='noborder'>
 				    <script type="text/template">
-				        ## Implementing the Helmert transform – first steps
+				        ## Implementing the transform – first steps
 				        Not going to go into much detail, because it's quite boring?
 				        `conversions.rs`, L284–373
 				    </script>
@@ -229,13 +230,22 @@ Where:
 				    <section data-markdown data-state='noborder'>
 				    <script type="text/template">
 ### Integrating the adjustments
-There's just one problem: there are 876,951 adjustments.
-Each adjustment is a set of three floating-point values.
+There's just one problem: there are 876,951 adjustments.  
+Each adjustment is a set of three floating-point values.  
+They're in a SQLite DB  
 				    </script>
 				    </section>
 				    <section data-markdown data-state='noborder'>
 				    <script type="text/template">
-					        ## PHF
+## PHF
+- A compile-time static map
+- Get all the records using `rusqlite`
+- Copy and adapt the `PHF` example
+	- Key is an `i32`, value is `(f64, f64, f64)`
+- It takes a long time to build
+- It also takes a long time to compile
+	- Split it into a separate crate, add it to `Cargo.toml`
+	- Never worry about it again
 				    </script>
 				    </section>
 				    <section data-markdown data-state='noborder'>
@@ -333,7 +343,7 @@ fn convert_vec_direct<'a, F>(ex: &'a mut [f64],
                              ny: &'a mut [f64],
                              func: F)
                              -> (&'a mut [f64], &'a mut [f64])
-    where F: Fn(&f64, &f64) -> Result<(f64, f64), ()> + Send + Copy + Sync
+    where F: Fn(&f64, &f64) -> Result<(f64, f64), ()> + Send + Copy
 {
     let numthreads = num_cpus::get() as usize;
     let mut size = ex.len() / numthreads;
@@ -374,7 +384,7 @@ fn convert_vec_direct<'a, F>(ex: &'a mut [f64],
                              ny: &'a mut [f64],
                              func: F)
                              -> (&'a mut [f64], &'a mut [f64])
-    where F: Fn(&f64, &f64) -> Result<(f64, f64), ()> + Send + Copy + Sync
+    where F: Fn(&f64, &f64) -> Result<(f64, f64), ()> + Send + Copy
 {
     ex.par_iter_mut().zip(ny.par_iter_mut()).for_each(|p| {
         match func(p.0, p.1) {
@@ -400,16 +410,8 @@ fn convert_vec_direct<'a, F>(ex: &'a mut [f64],
 					        [![Compare](assets/crossbeam_v_rayon.png)]()
 				    </script>
 				    </section>
-					<section data-markdown>
-				    <script type="text/template">
-					</script>
-					</section>
-				    <section data-markdown data-state='noborder'>
-				    <script type="text/template">
-					        ## Splitting Code into Modules
-				    </script>
-				    </section>
-			    <section>
+			    </section>
+				<section>
 				    <section data-markdown data-state='noborder'>
 				    <script type="text/template">
 					        ## Building Python Wheels
