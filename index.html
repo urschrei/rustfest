@@ -67,6 +67,13 @@
 					</script>
 					</section>
 				</section>
+					<section data-markdown data-state='noborder'>
+				    <script type="text/template">
+					## Why Rust?
+					- A series of weird coincidences
+					- A need to convert large numbers of coordinates
+					</script>
+					</section>
 
 
 				<section>
@@ -122,7 +129,7 @@
 Datums can differ in three ways:
 
 1. Position of the origin of coordinates
-2. Orientation of the coordinate axes (and hence of the reference ellipsoid
+2. Orientation of the coordinate axes (and hence of the reference ellipsoid)
 3. Size and shape of the reference ellipsoid
 				    </script>
 				    </section>
@@ -180,17 +187,15 @@ Where:
 (there are no more mathematical formulæ in this talk, fyi)
 				    </script>
 				    </section>
-			    </section>
-			    <section>
 				    <section data-markdown data-state='noborder'>
 				    <script type="text/template">
 					        ## So we're done here?
 					        Well, no.
-					        …the Helmert transform introduces error up to 3m in plan.  
+					        …the Helmert transform introduces horizontal error up to 3m.  
 					        (we're not really worried about height)  
 
 					        This is OK, but no use for accurate applications like surveying.
-					        These demand transformations accurate to around 1.1mm
+					        These demand transformations accurate to around 0.1m
 				    </script>
 				    </section>
 				    <section data-markdown data-state='noborder'>
@@ -204,7 +209,7 @@ Where:
 				    </section>
 				    <section data-markdown data-state='noborder'>
 				    <script type="text/template">
-						### Implementing the OSTN02™ / OSTN15™ transform
+						## Implementing the OSTN02™ / OSTN15™ transform
 
 						1. 7-step Helmert Transform (WGS84 Lon, Lat ➡️ ETRS89 Eastings and Northings)
 						2. Retrieval of precisely-calculated parameters within a kilometer grid
@@ -212,11 +217,13 @@ Where:
 						4. Addition of these produces the shift from the GRS80 to the Airy 1830 Ellipsoid
 				    </script>
 				    </section>
+			    </section>
+			    <section>
 				    <section data-markdown data-state='noborder'>
 				    <script type="text/template">
-					        ## Implementing the Helmert transform – first steps
-					        Not going to go into much detail, because it's quite boring?
-					        `conversions.rs`, L284–373
+				        ## Implementing the Helmert transform – first steps
+				        Not going to go into much detail, because it's quite boring?
+				        `conversions.rs`, L284–373
 				    </script>
 				    </section>
 				    <section data-markdown data-state='noborder'>
@@ -233,13 +240,89 @@ Each adjustment is a set of three floating-point values.
 				    </section>
 				    <section data-markdown data-state='noborder'>
 				    <script type="text/template">
-					        ## Single-threaded implementation
+## First Attempt at Threading
+```rust
+#[no_mangle]
+pub extern "C" fn convert_thr(eastings: Array, northings: Array) -> Array {
+    // we're receiving floats
+    let lon = unsafe { eastings.as_i32_slice() };
+    let lat = unsafe { northings.as_i32_slice() };
+    // copy values and combine
+    let orig: Vec<(i32, i32)> = lon.iter()
+        .cloned()
+        .zip(lat.iter()
+            .cloned())
+        .collect();
+
+    let mut guards: Vec<JoinHandle<Vec<(f64, f64)>>> = vec![];
+    // split into slices
+    let mut size = orig.len() / NUMTHREADS;
+    if orig.len() % NUMTHREADS > 0 {
+        size += 1;
+    }
+    // if orig.len() == 0, we need another adjustment
+    size = std::cmp::max(1, size);
+    for chunk in orig.chunks(size) {
+        let chunk = chunk.to_owned();
+        let g = thread::spawn(move || {
+            chunk.into_iter()
+                .map(|elem| convert_lonlat(elem.0, elem.1))
+                .collect()
+        });
+        guards.push(g);
+    }
+    let mut result: Vec<FloatTuple> = Vec::with_capacity(orig.len());
+    for g in guards {
+        result.extend(g.join()
+            .unwrap()
+            .into_iter()
+            .map(|floats| {
+                FloatTuple {
+                    a: floats.0 as f32,
+                    b: floats.1 as f32,
+                }
+            }));
+    }
+    Array::from_vec(result)
+}
+```
 				    </script>
 				    </section>
 				    <section data-markdown data-state='noborder'>
 				    <script type="text/template">
-					        ## Comparing Crossbeam and Rayon
-					        [![Compare](assets/crossbeam_v_rayon.png)]()
+This is…not great;
+- Cloning slices into a `Vec`
+- Calling `to_owned()` allocates again
+- Is this an `unwrap()` I see before me?
+
+😭😭😭
+				    </script>
+				    </section>
+				    <section data-markdown data-state='noborder'>
+				    <script type="text/template">
+## Time for a Re-Think
+The problem, in an abstract sort of way:
+- We've got a sequence of values
+- The **length** of the sequence isn't going to change
+- The **type** of the values isn't going to change
+
+**We can use mutable slices**
+				    </script>
+				    </section>
+				    <section data-markdown data-state='noborder'>
+				    <script type="text/template">
+## Time for a Re-Think, II
+- Some time has passed, and scoped-thread libraries exist now
+- Can we be generic? Yep:
+	- Accept two sequences
+	- Accept a function
+	- Zip the sequences, and split the result into mutable chunks
+	- For each chunk, spawn a thread
+		- In each thread, apply the function to a chunk of the sequence
+		- Join them up again at the end
+
+🍾
+
 				    </script>
 				    </section>
 					<section data-markdown data-state='noborder'>
@@ -311,6 +394,12 @@ fn convert_vec_direct<'a, F>(ex: &'a mut [f64],
 ```
 				    </script>
 				    </section>
+				    <section data-markdown data-state='noborder'>
+				    <script type="text/template">
+					        ## Comparing Crossbeam and Rayon
+					        [![Compare](assets/crossbeam_v_rayon.png)]()
+				    </script>
+				    </section>
 					<section data-markdown>
 				    <script type="text/template">
 					</script>
@@ -320,7 +409,6 @@ fn convert_vec_direct<'a, F>(ex: &'a mut [f64],
 					        ## Splitting Code into Modules
 				    </script>
 				    </section>
-			    </section>
 			    <section>
 				    <section data-markdown data-state='noborder'>
 				    <script type="text/template">
