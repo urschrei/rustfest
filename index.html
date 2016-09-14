@@ -445,7 +445,7 @@ The problem, in an abstract sort of way:
 	- Accept a function
 	- Zip the sequences, and split the result into mutable chunks
 	- For each chunk, spawn a thread
-		- In each thread, apply the function to a chunk of the sequence
+		- In each thread, apply the conversion function to the chunk
 		- Join them up again at the end
 
 				    </script>
