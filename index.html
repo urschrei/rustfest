@@ -74,11 +74,11 @@
 				</section>
 					<section data-markdown data-state='noborder'>
 				    <script type="text/template">
-I'd give this talk in German, but you might say it's a little…
+I'd give this talk in German, but you might say it's a little…<!-- .element: class="fragment" data-fragment-index="1" -->
 
-Rusty.  
+Rusty.  <!-- .element: class="fragment" data-fragment-index="2" -->
 
-😎
+😎 <!-- .element: class="fragment" data-fragment-index="3" -->
 					</script>
 					</section>
 					<section data-markdown data-state='noborder'>
@@ -101,7 +101,7 @@ Rusty.
 					- Has a long, FORTRAN-based heritage (going back to the 80s)
 					- First PROJ.4 release was 1994
 					- High-quality, well-maintained, open-source
-					- `Pyproj` is a Cython-based wrapper
+					- `Pyproj` is a Cython-based wrapper for PROJ.4
 					</script>
 					</section>
 					<section data-markdown data-state='noborder'>
@@ -117,7 +117,7 @@ Rusty.
 					</section>
 					<section data-markdown data-state='noborder'>
 				    <script type="text/template">
-					        ### What is a coordinate system (CRS)
+					        ### What is a coordinate (reference) system (CRS)
 					        - A way of describing locations on earth
 					        - Two components: the *datum*, and the *coordinate system*
 
@@ -173,7 +173,7 @@ Datums can differ in three ways:
 				    </section>
 				    <section data-markdown data-state='noborder'>
 				    <script type="text/template">
-## Transforming Between Coordinate Systems
+## Transforming Between Coordinate Systems, II
 - If you work in 3D cartesian coordinates, you don't have to worry about (3)
 - It's straightforward to carry out this conversion
 - Just trust me on this
@@ -181,7 +181,7 @@ Datums can differ in three ways:
 				    </section>
 				    <section data-markdown data-state='noborder'>
 				    <script type="text/template">
-## Transforming Between Coordinate Systems
+## Transforming Between Coordinate Systems, III
 We use six parameters to describe the difference between two datums:
 - Three parameters to describe a 3D translation between the coordinate origins
 - Three parameters to describe a 3D rotation between the orientations of the coordinate axes.
@@ -227,7 +227,7 @@ Where:
 				    </section>
 				    <section data-markdown data-state='noborder'>
 				    <script type="text/template">
-					        ## So we're done here?
+					        ### So we're done here?
 					        Well, no.
 					        …the Helmert transform introduces horizontal error up to 3m.  
 					        (we're not really worried about height)  
@@ -248,7 +248,7 @@ Where:
 				    </section>
 				    <section data-markdown data-state='noborder'>
 				    <script type="text/template">
-						## Implementing the OSTN02™ / OSTN15™ transform
+						### Implementing the OSTN02™ / OSTN15™ transform
 
 						1. Carry out Helmert Transform
 							- (WGS84 Lon, Lat ➡️ ETRS89 Eastings and Northings)
@@ -263,14 +263,79 @@ Where:
 			    <section>
 				    <section data-markdown data-state='noborder'>
 				    <script type="text/template">
-				        ## Implementing the transform – first steps
-				        Not going to go into much detail, because it's quite boring?
+				        ### Getting Started
+				        - I have no idea how FFI works in Rust
+				        - I asked on SO, outlining my (terrible, btw) design
+				    </script>
+				    </section>
+				    <section data-markdown data-state='noborder'>
+				    <script type="text/template">
+### FFI
+```rust
+#[repr(C)]
+pub struct Array {
+    data: *const c_void,
+    len: libc::size_t,
+}
+
+impl Array {
+    unsafe fn as_f32_slice(&self) -> &[f32] {
+        assert!(!self.data.is_null());
+        slice::from_raw_parts(self.data as *const f32, self.len as usize)
+    }
+    unsafe fn as_i32_slice(&self) -> &[i32] {
+        assert!(!self.data.is_null());
+        slice::from_raw_parts(self.data as *const i32, self.len as usize)
+    }
+
+    fn from_vec<T>(mut vec: Vec<T>) -> Array {
+        // Important to make length and capacity match
+        // A better solution is to track both length and capacity
+        vec.shrink_to_fit();
+        let array = Array {
+            data: vec.as_ptr() as *const libc::c_void,
+            len: vec.len() as libc::size_t
+        };
+        // Whee! Leak the memory, and now the raw pointer (and
+        // eventually C) is the owner.
+        mem::forget(vec);
+        array
+    }
+}
+
+#[no_mangle]
+pub extern fn drop_array(p: *const Array) {
+    if p.is_null() { return }
+    unsafe { drop(p) };
+}
+```
+				    </script>
+				    </section>
+				    <section data-markdown data-state='noborder'>
+				    <script type="text/template">
+				        ### Implementing the transform
+				        - This was…really easy?
+				        - Almost nothing Rust-specific
+				        	1. A series of arithmetic and trig operations
+				        	2. Lookup and addition of adjustments
+				        
 				        `conversions.rs`, L284–373
 				    </script>
 				    </section>
 				    <section data-markdown data-state='noborder'>
 				    <script type="text/template">
-## Integrating the adjustments
+				        ### Checking for floating-point instability
+				        Use Herbie!
+				        - Developed as a standalone tool by UW
+				        - Implemented as a compiler plugin, so you'll need Nightly
+				        - It doesn't just find problems, it suggests improvements!
+
+				        https://github.com/mcarton/rust-herbie-lint
+				    </script>
+				    </section>
+				    <section data-markdown data-state='noborder'>
+				    <script type="text/template">
+### Integrating the adjustments
 There's just one problem: there are 876,951 adjustments.  
 Each adjustment is a set of three floating-point values.  
 They're in a SQLite DB  
@@ -278,10 +343,10 @@ They're in a SQLite DB
 				    </section>
 				    <section data-markdown data-state='noborder'>
 				    <script type="text/template">
-## PHF
+### PHF
 - A compile-time static map
-- Get all the records using `rusqlite`
 - Copy and adapt the `PHF` example
+	- Get all the records using `rusqlite`
 	- Key is an `i32`, value is `(f64, f64, f64)`
 - It takes a long time to build
 - It also takes a long time to compile
@@ -297,7 +362,7 @@ They're in a SQLite DB
 
 				    <section data-markdown data-state='noborder'>
 				    <script type="text/template">
-## First Attempt at Threading
+### First Attempt at Threading
 ```rust
 #[no_mangle]
 pub extern "C" fn convert_thr(eastings: Array, northings: Array) -> Array {
@@ -345,7 +410,7 @@ pub extern "C" fn convert_thr(eastings: Array, northings: Array) -> Array {
 				    </section>
 				    <section data-markdown data-state='noborder'>
 				    <script type="text/template">
-This is…not great;
+### This is…not great;
 - Casting from i32 to f64
 - Cloning slices into a `Vec`
 - Calling `to_owned()` allocates again
@@ -361,7 +426,7 @@ I mean, the Array are in scope until the end of the call, and they are already u
 				    </section>
 				    <section data-markdown data-state='noborder'>
 				    <script type="text/template">
-## Time for a Re-Think
+### Time for a Re-Think
 The problem, in an abstract sort of way:
 - We've got a sequence of values
 - The **length** of the sequence isn't going to change
@@ -373,7 +438,7 @@ The problem, in an abstract sort of way:
 				    </section>
 				    <section data-markdown data-state='noborder'>
 				    <script type="text/template">
-## Time for a Re-Think, II
+### Time for a Re-Think, II
 - Some time has passed, and scoped-thread libraries exist now
 - Can we be generic? Yep:
 	- Accept two sequences
@@ -383,13 +448,11 @@ The problem, in an abstract sort of way:
 		- In each thread, apply the function to a chunk of the sequence
 		- Join them up again at the end
 
-🍾
-
 				    </script>
 				    </section>
 				    <section data-markdown data-state='noborder'>
 				    <script type="text/template">
-					        ## Interlude
+					        ### Interlude
 					        I didn't realise that `chunks()` / `chunks_mut()` returned slices
 					        - It took *days* to get the syntax correct
 					        - I thought the docs could be clearer about this
@@ -401,7 +464,7 @@ The problem, in an abstract sort of way:
 				    </section>
 					<section data-markdown data-state='noborder'>
 				    <script type="text/template">
-## Crossbeam
+### Crossbeam
 ```rust
 fn convert_vec_direct<'a, F>(ex: &'a mut [f64],
                              ny: &'a mut [f64],
@@ -442,7 +505,7 @@ fn convert_vec_direct<'a, F>(ex: &'a mut [f64],
 				    </section>
 				    <section data-markdown data-state='noborder'>
 				    <script type="text/template">
-## Rayon
+### Rayon
 ```rust
 fn convert_vec_direct<'a, F>(ex: &'a mut [f64],
                              ny: &'a mut [f64],
@@ -528,14 +591,14 @@ fn convert_vec_direct<'a, F>(ex: &'a mut [f64],
 				<section>
 					<section data-markdown>
 				    <script type="text/template">
-					## Benchmarking `convertbng`
+					### Benchmarking `convertbng`
 					- Generate 10m random WGS84 points within the GLA boundary <!-- .element: class="fragment" data-fragment-index="1" -->
 					- Convert them to OSGB36 <!-- .element: class="fragment" data-fragment-index="2" -->
 					</script>
 					</section>
 					<section data-markdown>
 				    <script type="text/template">
-					## Benchmarking `convertbng`
+					### Benchmarking `convertbng`
 					Methodology
 					- 4 Amazon EC2 C4 (compute-optimised) systems were tested
 					- The system was calibrated by taking the mean of 5 calibration runs of 1m random numbers
@@ -557,7 +620,7 @@ fn convert_vec_direct<'a, F>(ex: &'a mut [f64],
 				</section>
 				<section data-markdown>
 			    <script type="text/template">
-				## What next for Geospatial Computing using Rust?
+				### What next for Geospatial Computing using Rust?
 				- Geo-rust exists
 				- Under active development
 					- Aims to provide a subset of geospatial primitives (think GEOS), in the first instance
