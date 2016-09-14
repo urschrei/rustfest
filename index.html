@@ -67,20 +67,57 @@
 					[![Transforms](assets/isochrone.png)]()
 					</script>
 					</section>
+					<section data-background-video="assets/tweetcity.mp4" data-background-video-loop data-background-video-muted>
+					<script type="text/template">
+					</script>
+					</section>
 				</section>
 					<section data-markdown data-state='noborder'>
 				    <script type="text/template">
-					## Why Rust?
-					- A series of weird coincidences
-					- A need to convert large numbers of coordinates
+I'd give this talk in German, but you might say it's a little…
+
+Rusty.  
+
+😎
 					</script>
 					</section>
-
-
+					<section data-markdown data-state='noborder'>
+				    <script type="text/template">
+(I'm so, so sorry)
+					</script>
+					</section>
+					<section data-markdown data-state='noborder'>
+				    <script type="text/template">
+					### Why Rust?
+					- A series of weird coincidences
+					- A need to convert large numbers of coordinates
+						- Ordinarily, you'd use PROJ.4 for this
+					</script>
+					</section>
+					<section data-markdown data-state='noborder'>
+				    <script type="text/template">
+					### PROJ.4
+					- General library for coordinate transformations
+					- Has a long, FORTRAN-based heritage (going back to the 80s)
+					- First PROJ.4 release was 1994
+					- High-quality, well-maintained, open-source
+					- `Pyproj` is a Cython-based wrapper
+					</script>
+					</section>
+					<section data-markdown data-state='noborder'>
+				    <script type="text/template">
+				    I wanted to see whether I could write something as fast, and as correct as PROJ.4
+					</script>
+					</section>
 				<section>
 					<section data-markdown data-state='noborder'>
 				    <script type="text/template">
-					        ## What is a coordinate system (CRS)
+				    ## A Brief Discussion of Coordinate Reference Systems
+					</script>
+					</section>
+					<section data-markdown data-state='noborder'>
+				    <script type="text/template">
+					        ### What is a coordinate system (CRS)
 					        - A way of describing locations on earth
 					        - Two components: the *datum*, and the *coordinate system*
 
@@ -98,13 +135,13 @@
 				    </section>
 				    <section data-markdown data-state='noborder'>
 				    <script type="text/template">
-					        ## WGS 84 
+					        ### WGS 84 
 					        - US-led, but now a global system
 					        - Datum specifies an origin at the centre of the earth
 					        - Uses the WGS 84 ellipsoid
 					        - Position within WGS 84 is determined using GPS
 					        - Designed to be globally consistent ±1m
-					        - ETRS89 is a high-accuracy "realisation" of WGS 84, used for surveying
+					        - ETRS89 is a high-accuracy "realisation" of WGS 84, used for surveying in Europe
 				    </script>
 				    </section>
 				    <section data-markdown data-state='noborder'>
@@ -113,7 +150,7 @@
 				    </section>
 				    <section data-markdown data-state='noborder'>
 				    <script type="text/template">
-## The "National Grid"
+### The "National Grid"
 - Used on UK maps
 - Also used in Shape Files
 - Based on OSGB36 datum
@@ -201,21 +238,25 @@ Where:
 				    </section>
 				    <section data-markdown data-state='noborder'>
 				    <script type="text/template">
-## UK Ordnance Survey Has Got This
-### The OSTN02™ and OSTN15™ transforms
+### Thankfully, UK Ordnance Survey Has Got This
+#### The OSTN02™ and OSTN15™ transforms
 - "Rubber-sheet" transforms
 - Use a file of grid shift parameters with 1km resolution
 - Bilinear interpolation to get precise adjustments
+- OSTN15 is the latest version, it launched about a week ago 
 				    </script>
 				    </section>
 				    <section data-markdown data-state='noborder'>
 				    <script type="text/template">
 						## Implementing the OSTN02™ / OSTN15™ transform
 
-						1. 7-step Helmert Transform (WGS84 Lon, Lat ➡️ ETRS89 Eastings and Northings)
-						2. Retrieval of precisely-calculated parameters within a kilometer grid
+						1. Carry out Helmert Transform
+							- (WGS84 Lon, Lat ➡️ ETRS89 Eastings and Northings)
+							- This introduces some positional error into the coordinate
+						2. Retrieve grid shift parameters for the relevant kilometer grid
 						3. Bilinear interpolation to determine precise corrections to apply
 						4. Addition of these produces the shift from the GRS80 to the Airy 1830 Ellipsoid
+						5. We're pretty much done
 				    </script>
 				    </section>
 			    </section>
@@ -229,7 +270,7 @@ Where:
 				    </section>
 				    <section data-markdown data-state='noborder'>
 				    <script type="text/template">
-### Integrating the adjustments
+## Integrating the adjustments
 There's just one problem: there are 876,951 adjustments.  
 Each adjustment is a set of three floating-point values.  
 They're in a SQLite DB  
@@ -250,11 +291,16 @@ They're in a SQLite DB
 				    </section>
 				    <section data-markdown data-state='noborder'>
 				    <script type="text/template">
+				        ## I Want This To Be Fast 
+				    </script>
+				    </section>
+
+				    <section data-markdown data-state='noborder'>
+				    <script type="text/template">
 ## First Attempt at Threading
 ```rust
 #[no_mangle]
 pub extern "C" fn convert_thr(eastings: Array, northings: Array) -> Array {
-    // we're receiving floats
     let lon = unsafe { eastings.as_i32_slice() };
     let lat = unsafe { northings.as_i32_slice() };
     // copy values and combine
@@ -263,7 +309,6 @@ pub extern "C" fn convert_thr(eastings: Array, northings: Array) -> Array {
         .zip(lat.iter()
             .cloned())
         .collect();
-
     let mut guards: Vec<JoinHandle<Vec<(f64, f64)>>> = vec![];
     // split into slices
     let mut size = orig.len() / NUMTHREADS;
@@ -301,9 +346,15 @@ pub extern "C" fn convert_thr(eastings: Array, northings: Array) -> Array {
 				    <section data-markdown data-state='noborder'>
 				    <script type="text/template">
 This is…not great;
+- Casting from i32 to f64
 - Cloning slices into a `Vec`
 - Calling `to_owned()` allocates again
 - Is this an `unwrap()` I see before me?
+
+> Actually, is there any reason for cloning at all here?  
+I mean, the Array are in scope until the end of the call, and they are already unsafe, let's pass thin handles to them and avoid all those vectors (and memory allocations). 
+
+> – mathieum
 
 😭😭😭
 				    </script>
@@ -315,6 +366,7 @@ The problem, in an abstract sort of way:
 - We've got a sequence of values
 - The **length** of the sequence isn't going to change
 - The **type** of the values isn't going to change
+	- I re-read the spec – you **must** use `f64` values
 
 **We can use mutable slices**
 				    </script>
