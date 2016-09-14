@@ -426,37 +426,50 @@ fn convert_vec_direct<'a, F>(ex: &'a mut [f64],
 				<section>
 				    <section data-markdown data-state='noborder'>
 				    <script type="text/template">
-					        ## Building Python Wheels
-				    </script>
-				    </section>
-				    <section data-markdown data-state='noborder'>
-				    <script type="text/template">
-					        ## What is `rpath`?!
+					        ### Building Python Wheels
 				    </script>
 				    </section>
 				    <section data-markdown data-state='noborder'>
 				    <script type="text/template">
 					        ## Using Rust-everywhere
+- Essential if you want to support Linux, OSX, and Windows
+- Straightforward to adapt your own needs, if your own needs are:
+	- Run tests
+	- If some condition is true, build artifacts and publish them as GitHub releases
+	- It can integrate bits of `travis-cargo` if you want coverage, separate doc builds
+- What I did:
+	- Build Rust libs for all platforms when a tag is pushed, and publish to GH
+	- Build script in my Python package pulls latest release from GH as part of my CI setup
+	- Works on Travis and Appveyor
 				    </script>
 				    </section>
 				    <section data-markdown data-state='noborder'>
 				    <script type="text/template">
 					        ## Difficulties and Gotchas
+- `setup.py` is **THE WORST THING EVER**
+- For Cython, it incorporates compiler and linker arguments
+	- these are completely different for each platform
+	- 😭😭😭
 				    </script>
 				    </section>
 				    <section data-markdown data-state='noborder'>
 				    <script type="text/template">
 					        ## `manylinux1`
+- The official Linux build for widely-compatible Python wheels
+- It's available as a docker image
+- If you want a `manylinux1`-compatible dylib (and you do), you have to build using it
 				    </script>
 				    </section>
 				    <section data-markdown data-state='noborder'>
 				    <script type="text/template">
 					        ## MinGWPy
+- Not available for Python 3.5
 				    </script>
 				    </section>
 				    <section data-markdown data-state='noborder'>
 				    <script type="text/template">
 					        ## OSX
+- Lots of excellent build scripts at wheel-builders
 				    </script>
 				    </section>
 			    </section>
@@ -482,10 +495,10 @@ fn convert_vec_direct<'a, F>(ex: &'a mut [f64],
 	## Results
 | EC2 Instance Type    | Processors (vCPU) | Rust Ctypes (s) | Rust Cython (s) | Pyproj (s) | Ctypes vs Pyproj | Cython vs Pyproj |
 |:----------|:----------:|:----------:|:----------:|:----------:|:----------:|----------:|
-| c4.xlarge            | 4                 | 14.432          | 12.114          |  18.358    |  -21.38%         |  -34.01%         |
-| c4.2xlarge           | 8                 | 8.699           | 6.417           |  18.03     |  -52.46%         |  -64.97%         |
-| c4.4xlarge           | 16                | 6.470           | 3.716           |  18.561    |  -65.14%         |  -79.97%         |
-| c4.8xlarge           | 36                | 4.913           | 2.501           |  17.965    |  -72.652%        |  -86.07%         |
+| c4.xlarge            | 4                 | 14.782          | 11.714          |  9.379     |   58.36%         |   24.97%         |
+| c4.2xlarge           | 8                 | 8.647           | 6.421           |  9.256     |  -6.57%          |  -30.62%         |
+| c4.4xlarge           | 16                | 6.470           | 3.716           |  9.398     |  -31.49%         |  -60.25%         |
+| c4.8xlarge           | 36                | 4.913           | 2.501           |  9.308     |  -48.05%         |  -73.35%         |
 
 					</script>
 					</section>
