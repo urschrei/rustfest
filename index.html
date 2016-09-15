@@ -28,10 +28,15 @@
 			<div class="slides">
 				<!-- <section>Slide 1</section> -->
 				<!-- <section>Slide 2</section> -->
-				<section data-markdown>
+				<section data-markdown style="text-align: left;">
 			    <script type="text/template">
 				        ## Teaching Myself Rust via the medium of Coordinate System Transforms
-				        Stephan Hügel, UCL CASA
+
+
+
+
+				        Stephan Hügel, UCL CASA  
+				        @urschrei
 				    </script>
 				</section>
 				<section data-markdown>
@@ -49,28 +54,28 @@
 				</section>
 				<!-- vertical example slides -->
 				<section>
-					<section data-markdown data-state='noborder'>
+					<section data-markdown data-state='noborder' data-background-color="white">
 				    <script type="text/template">
 					## Data Analysis
 					[![Routing](https://github.com/urschrei/router_comparison/raw/master/combined_gh.png)]()
 					</script>
 					</section>
-					<section data-markdown data-state='noborder'>
+					<section data-markdown data-state='noborder' data-background-color="white">
 				    <script type="text/template">
 					## Spatial Analysis
 					[![Gridding](https://github.com/urschrei/Geopython/raw/master/data/rainfall_interpolation.gif)]()
 					</script>
 					</section>
-					<section data-markdown data-state='noborder'>
+					<section data-markdown data-state='noborder' data-background-color="white">
 				    <script type="text/template">
 					## Data Viz
 					[![Transforms](assets/isochrone.png)]()
 					</script>
 					</section>
-					<section data-background-video="assets/tweetcity.mp4" data-background-video-loop data-background-video-muted>
+<!-- 					<section data-background-video="assets/tweetcity.mp4" data-background-video-loop data-background-video-muted>
 					<script type="text/template">
 					</script>
-					</section>
+					</section> -->
 				</section>
 					<section data-markdown data-state='noborder'>
 				    <script type="text/template">
@@ -104,7 +109,7 @@ Rusty.  <!-- .element: class="fragment" data-fragment-index="2" -->
 					- `Pyproj` is a Cython-based wrapper for PROJ.4
 					</script>
 					</section>
-					<section data-markdown data-state='noborder'>
+					<section data-markdown data-state='noborder' style="text-align: left;">
 				    <script type="text/template">
 				    I wanted to see whether I could write something as fast, and as correct as PROJ.4
 					</script>
@@ -333,11 +338,13 @@ pub extern fn drop_array(p: *const Array) {
 				        https://github.com/mcarton/rust-herbie-lint
 				    </script>
 				    </section>
-				    <section data-markdown data-state='noborder'>
+				    <section data-markdown data-state='noborder' style="text-align: left;">
 				    <script type="text/template">
 ### Integrating the adjustments
 There's just one problem: there are 876,951 adjustments.  
+
 Each adjustment is a set of three floating-point values.  
+
 They're in a SQLite DB  
 				    </script>
 				    </section>
@@ -455,6 +462,21 @@ The problem, in an abstract sort of way:
 					        ### Interlude
 					        I didn't realise that `chunks()` / `chunks_mut()` returned slices
 					        - It took *days* to get the syntax correct
+					        - Andrew Hobden's **"Reading Rust Function Signatures"** was incredibly helpful
+				    </script>
+				    </section>
+				    <section data-markdown data-state='noborder'>
+				    <script type="text/template">
+					        ### Interlude II
+					        [![Transforms](assets/notebook.png)]()
+
+					        (This didn't work, but I was on the right track)
+
+				    </script>
+				    </section>
+				    <section data-markdown data-state='noborder'>
+				    <script type="text/template">
+					        ### Interlude III
 					        - I thought the docs could be clearer about this
 					        - So I opened an issue
 					        	- Had a reasonable conversation about doc clarity
@@ -531,6 +553,13 @@ fn convert_vec_direct<'a, F>(ex: &'a mut [f64],
 ```
 				    </script>
 				    </section>
+				    <section data-markdown data-state='noborder'>
+				    <script type="text/template">
+- We need a lifetime specifier because we're returning borrowed values
+- I used a separate specifier for each slice at first
+    - It turns out that a single specifier suffices
+				    </script>
+				    </section>
 				    <section data-markdown data-state='noborder' data-background-color="white">
 				    <script type="text/template">
 					        ## Comparing Crossbeam and Rayon
@@ -577,14 +606,17 @@ fn convert_vec_direct<'a, F>(ex: &'a mut [f64],
 				    </section>
 				    <section data-markdown data-state='noborder'>
 				    <script type="text/template">
-					        ## MinGWPy
-- Not available for Python 3.5
+					        ## Mingwpy
+- Based on the `mingw-w64` gcc compilers
+- Not available for Python 3.5 yet
 				    </script>
 				    </section>
-				    <section data-markdown data-state='noborder'>
+				    <section data-markdown data-state='noborder' style="text-align: left;">
 				    <script type="text/template">
 					        ## OSX
-- Lots of excellent build scripts at wheel-builders
+Lots of excellent build scripts:
+
+https://github.com/matthew-brett/multibuild
 				    </script>
 				    </section>
 			    </section>
@@ -637,6 +669,7 @@ fn convert_vec_direct<'a, F>(ex: &'a mut [f64],
 				- Me: @urschrei on Twitter / Github
 				- `lonlat_bng`: https://github.com/lonlat_bng
 				- `convertbng`: https://github.com/convertbng
+				- [Reading Rust Function Signatures](https://hoverbear.org/2015/07/10/reading-rust-function-signatures)
 				- [A Guide to Coordinate Systems in Great Britain](https://www.ordnancesurvey.co.uk/docs/support/guide-coordinate-systems-great-britain.pdf)
 				- Rust-geo: https://github.com/georust/rust-geo
 				</script>
