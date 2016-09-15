@@ -439,10 +439,10 @@ The problem, in an abstract sort of way:
 				    <section data-markdown data-state='noborder'>
 				    <script type="text/template">
 ### Time for a Re-Think, II
-- Some time has passed, and scoped-thread libraries exist now
+- Some time has passed, and threading libraries exist now
 - Can we be generic? Yep:
 	- Accept two sequences
-	- Accept a function
+	- And a function which implements the `Send` and `Copy` traits
 	- Zip the sequences, and split the result into mutable chunks
 	- For each chunk, spawn a thread
 		- In each thread, apply the conversion function to the chunk
@@ -459,7 +459,7 @@ The problem, in an abstract sort of way:
 					        - So I opened an issue
 					        	- Had a reasonable conversation about doc clarity
 					        	- And then I sent a PR, (which altered 2 words)
-					        - And it was merged! (thanks Steve)
+					        - And it was merged! (thanks @steveklabnik)
 				    </script>
 				    </section>
 					<section data-markdown data-state='noborder'>
@@ -634,10 +634,10 @@ fn convert_vec_direct<'a, F>(ex: &'a mut [f64],
 				<section data-markdown>
 			    <script type="text/template">
 				## Thanks! Questions?
-				- Me: @urschrei on Twitter
-				- Rust: http://rust-lang.org
-				- `convertbng`: https://github.com/convertbng
+				- Me: @urschrei on Twitter / Github
 				- `lonlat_bng`: https://github.com/lonlat_bng
+				- `convertbng`: https://github.com/convertbng
+				- [A Guide to Coordinate Systems in Great Britain](https://www.ordnancesurvey.co.uk/docs/support/guide-coordinate-systems-great-britain.pdf)
 				- Rust-geo: https://github.com/georust/rust-geo
 				</script>
 				</section>
