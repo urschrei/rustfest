@@ -2,6 +2,8 @@
 <html>
 	<head>
 		<meta charset="utf-8">
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 		<meta name="description" content="An introduction to geospatial computing using Rust" />
         <meta name="author" content="Stephan Hügel" />
@@ -43,10 +45,10 @@
 			    <script type="text/template">
 				        ## About Me
 				        - 4th year PhD student (I should be writing)
-				        	- English degree
-				        	- Master's in DH
 				        - I mostly work on smart cities – history, policy, future
+				        	- (Smart) cities: urban socio-technical systems
 				        - Programming is not my job
+					        - I have an English degree
 					        - I do data analysis and visualisation as productive procrastination
 					        - Mostly work in Python (Pandas, NumPy, Matplotlib, Basemap)
 					        - I use a lot of maps of parts of the UK
@@ -72,10 +74,10 @@
 					[![Transforms](assets/isochrone.png)]()
 					</script>
 					</section>
-<!-- 					<section data-background-video="assets/tweetcity.mp4" data-background-video-loop data-background-video-muted>
+					<section data-background-video="assets/tweetcity.mp4" data-background-video-loop data-background-video-muted>
 					<script type="text/template">
 					</script>
-					</section> -->
+					</section>
 				</section>
 					<section data-markdown data-state='noborder'>
 				    <script type="text/template">
@@ -228,6 +230,12 @@ Where:
 - $s$ is the scale factor (unitless) minus one.
 
 (there are no more mathematical formulæ in this talk, fyi)
+				    </script>
+				    </section>
+				    <section data-markdown data-state='noborder'>
+				    <script type="text/template">
+<!-- Of course, we know that these are…theories   -->
+[![Flat](assets/flat.png)]()
 				    </script>
 				    </section>
 				    <section data-markdown data-state='noborder'>
@@ -665,13 +673,34 @@ https://github.com/matthew-brett/multibuild
 				</section>
 				<section data-markdown>
 			    <script type="text/template">
-				## Thanks! Questions?
+				### This talk
+				- It's all true
+				- I haven't talked about the community much
+				- It's probably the most important part
+				</script>
+				</section>
+				<section data-markdown>
+			    <script type="text/template">
+				- Some parts of learning Rust are really, really difficult
+				- The community is helpful
+					- but it's also supportive, and encouraging
+				- Watching you helping people, and being kind to one another, is what keeps me writing Rust
+				- The Rust community isn't a socio-technical system (cities aren't, either)
+					- They're spaces in which kindness reveals itself in unexpected places
+				</script>
+				</section>
+				<section data-markdown>
+			    <script type="text/template">
+				## Thank You. Questions?
 				- Me: @urschrei on Twitter / Github
 				- `lonlat_bng`: https://github.com/lonlat_bng
 				- `convertbng`: https://github.com/convertbng
 				- [Reading Rust Function Signatures](https://hoverbear.org/2015/07/10/reading-rust-function-signatures)
 				- [A Guide to Coordinate Systems in Great Britain](https://www.ordnancesurvey.co.uk/docs/support/guide-coordinate-systems-great-britain.pdf)
 				- Rust-geo: https://github.com/georust/rust-geo
+				- Logo of the 2013 Flat Earth Society
+					- Source: http://wiki.tfes.org/File:Flat_Earth_Society_Logo.png
+					- License: CC BY-SA 4.0
 				</script>
 				</section>
 			</div>
