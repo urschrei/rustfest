@@ -1,174 +1,174 @@
 <!doctype html>
 <html>
-	<head>
-		<meta charset="utf-8">
+    <head>
+        <meta charset="utf-8">
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-		<meta name="description" content="An introduction to geospatial computing using Rust" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+        <meta name="description" content="An introduction to geospatial computing using Rust" />
         <meta name="author" content="Stephan Hügel" />
-		<title>Coordinate System</title>
+        <title>Coordinate System</title>
 
-		<link rel="stylesheet" href="css/reveal.css">
-		<link rel="stylesheet" href="css/theme/black.css">
-		<link rel="stylesheet" href="css/custom.css">
+        <link rel="stylesheet" href="css/reveal.css">
+        <link rel="stylesheet" href="css/theme/black.css">
+        <link rel="stylesheet" href="css/custom.css">
 
-		<!-- Theme used for syntax highlighting of code -->
-		<link rel="stylesheet" href="lib/css/monokai-sublime.css">
+        <!-- Theme used for syntax highlighting of code -->
+        <link rel="stylesheet" href="lib/css/monokai-sublime.css">
 
-		<!-- Printing and PDF exports -->
-		<script>
-			var link = document.createElement( 'link' );
-			link.rel = 'stylesheet';
-			link.type = 'text/css';
-			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
-			document.getElementsByTagName( 'head' )[0].appendChild( link );
-		</script>
-	</head>
-	<body>
-		<div class="reveal">
-			<div class="slides">
-				<!-- <section>Slide 1</section> -->
-				<!-- <section>Slide 2</section> -->
-				<section data-markdown style="text-align: left;">
-			    <script type="text/template">
-				        ## Teaching Myself Rust via the medium of Coordinate System Transforms
-
-
+        <!-- Printing and PDF exports -->
+        <script>
+            var link = document.createElement( 'link' );
+            link.rel = 'stylesheet';
+            link.type = 'text/css';
+            link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+            document.getElementsByTagName( 'head' )[0].appendChild( link );
+        </script>
+    </head>
+    <body>
+        <div class="reveal">
+            <div class="slides">
+                <!-- <section>Slide 1</section> -->
+                <!-- <section>Slide 2</section> -->
+                <section data-markdown style="text-align: left;">
+                <script type="text/template">
+                        ## Teaching Myself Rust via the medium of Coordinate System Transforms
 
 
-				        Stephan Hügel, UCL CASA  
-				        @urschrei
-				    </script>
-				</section>
-				<section data-markdown>
-			    <script type="text/template">
-				        ## About Me
-				        - 4th year PhD student (I should be writing)
-				        - I mostly work on smart cities – history, policy, future
-				        	- (Smart) cities: urban socio-technical systems
-				        - Programming is not my job
-					        - I have an English degree
-					        - I do data analysis and visualisation as productive procrastination
-					        - Mostly work in Python (Pandas, NumPy, Matplotlib, Basemap)
-					        - I use a lot of maps of parts of the UK
-				</script>
-				</section>
-				<!-- vertical example slides -->
-				<section>
-					<section data-markdown data-state='noborder' data-background-color="white">
-				    <script type="text/template">
-					## Data Analysis
-					[![Routing](https://github.com/urschrei/router_comparison/raw/master/combined_gh.png)]()
-					</script>
-					</section>
-					<section data-markdown data-state='noborder' data-background-color="white">
-				    <script type="text/template">
-					## Spatial Analysis
-					[![Gridding](https://github.com/urschrei/Geopython/raw/master/data/rainfall_interpolation.gif)]()
-					</script>
-					</section>
-					<section data-markdown data-state='noborder' data-background-color="white">
-				    <script type="text/template">
-					## Data Viz
-					[![Transforms](assets/isochrone.png)]()
-					</script>
-					</section>
-					<section data-background-video="assets/tweetcity.mp4" data-background-video-loop data-background-video-muted>
-					<script type="text/template">
-					</script>
-					</section>
-				</section>
-					<section data-markdown data-state='noborder'>
-				    <script type="text/template">
+
+
+                        Stephan Hügel, UCL CASA  
+                        @urschrei
+                    </script>
+                </section>
+                <section data-markdown>
+                <script type="text/template">
+        ## About Me
+        - 4th year PhD student (I should be writing)
+        - I mostly work on smart cities – history, policy, future
+            - (Smart) cities: urban socio-technical systems
+        - Programming is not my job
+            - I have an English degree
+            - I do data analysis and visualisation as productive procrastination
+            - Mostly work in Python (Pandas, NumPy, Matplotlib, Basemap)
+            - I use a lot of maps of parts of the UK
+                </script>
+                </section>
+                <!-- vertical example slides -->
+                <section>
+                    <section data-markdown data-state='noborder' data-background-color="white">
+                    <script type="text/template">
+                    ## Data Analysis
+                    [![Routing](https://github.com/urschrei/router_comparison/raw/master/combined_gh.png)]()
+                    </script>
+                    </section>
+                    <section data-markdown data-state='noborder' data-background-color="white">
+                    <script type="text/template">
+                    ## Spatial Analysis
+                    [![Gridding](https://github.com/urschrei/Geopython/raw/master/data/rainfall_interpolation.gif)]()
+                    </script>
+                    </section>
+                    <section data-markdown data-state='noborder' data-background-color="white">
+                    <script type="text/template">
+                    ## Data Viz
+                    [![Transforms](assets/isochrone.png)]()
+                    </script>
+                    </section>
+                    <section data-background-video="assets/tweetcity.mp4" data-background-video-loop data-background-video-muted>
+                    <script type="text/template">
+                    </script>
+                    </section>
+                </section>
+                    <section data-markdown data-state='noborder'>
+                    <script type="text/template">
 I'd give this talk in German, but you might say it's a little…<!-- .element: class="fragment" data-fragment-index="1" -->
 
 Rusty.  <!-- .element: class="fragment" data-fragment-index="2" -->
 
 😎 <!-- .element: class="fragment" data-fragment-index="3" -->
-					</script>
-					</section>
-					<section data-markdown data-state='noborder'>
-				    <script type="text/template">
+                    </script>
+                    </section>
+                    <section data-markdown data-state='noborder'>
+                    <script type="text/template">
 (I'm so, so sorry)
-					</script>
-					</section>
-					<section data-markdown data-state='noborder'>
-				    <script type="text/template">
-					### Why Rust?
-					- A series of weird coincidences
-					- A need to convert large numbers of coordinates
-						- Ordinarily, you'd use PROJ.4 for this
-					</script>
-					</section>
-					<section data-markdown data-state='noborder'>
-				    <script type="text/template">
-					### PROJ.4
-					- General library for coordinate transformations
-					- Has a long, FORTRAN-based heritage (going back to the 80s)
-					- First PROJ.4 release was 1994
-					- High-quality, well-maintained, open-source
-					- `Pyproj` is a Cython-based wrapper for PROJ.4
-					</script>
-					</section>
-					<section data-markdown data-state='noborder' style="text-align: left;">
-				    <script type="text/template">
-				    I wanted to see whether I could write something as fast, and as correct as PROJ.4
-					</script>
-					</section>
-				<section>
-					<section data-markdown data-state='noborder'>
-				    <script type="text/template">
-				    ## A Brief Discussion of Coordinate Reference Systems
-					</script>
-					</section>
-					<section data-markdown data-state='noborder'>
-				    <script type="text/template">
-					        ### What is a coordinate (reference) system (CRS)
-					        - A way of describing locations on earth
-					        - Two components: the *datum*, and the *coordinate system*
+                    </script>
+                    </section>
+                    <section data-markdown data-state='noborder'>
+                    <script type="text/template">
+                    ### Why Rust?
+                    - A series of weird coincidences
+                    - A need to convert large numbers of coordinates
+                        - Ordinarily, you'd use PROJ.4 for this
+                    </script>
+                    </section>
+                    <section data-markdown data-state='noborder'>
+                    <script type="text/template">
+                    ### PROJ.4
+                    - General library for coordinate transformations
+                    - Has a long, FORTRAN-based heritage (going back to the 80s)
+                    - First PROJ.4 release was 1994
+                    - High-quality, well-maintained, open-source
+                    - `Pyproj` is a Cython-based wrapper for PROJ.4
+                    </script>
+                    </section>
+                    <section data-markdown data-state='noborder' style="text-align: left;">
+                    <script type="text/template">
+                    I wanted to see whether I could write something as fast, and as correct as PROJ.4
+                    </script>
+                    </section>
+                <section>
+                    <section data-markdown data-state='noborder'>
+                    <script type="text/template">
+                    ## A Brief Discussion of Coordinate Reference Systems
+                    </script>
+                    </section>
+                    <section data-markdown data-state='noborder'>
+                    <script type="text/template">
+                            ### What is a coordinate (reference) system (CRS)
+                            - A way of describing locations on earth
+                            - Two components: the *datum*, and the *coordinate system*
 
-					        - **Datum**: describes how the CRS is related to the earth
-					        	- Position of the origin
-					        	- Scale
-					        	- **Surface**
-					        	- **Geoid**
+                            - **Datum**: describes how the CRS is related to the earth
+                                - Position of the origin
+                                - Scale
+                                - **Surface**
+                                - **Geoid**
 
-					        - **Coordinate system**: describes how the coordinates are expressed
-					        	- Cartesian (x, y, z)
-					        	- Ellipsoidal ($\lambda, \mu, \nu$)
-					        	- Projected coordinates (UTM: 13.38891º E, 52.51690º N)
-				    </script>
-				    </section>
-				    <section data-markdown data-state='noborder'>
-				    <script type="text/template">
-					        ### WGS 84 
-					        - US-led, but now a global system
-					        - Datum specifies an origin at the centre of the earth
-					        - Uses the WGS 84 ellipsoid
-					        - Position within WGS 84 is determined using GPS
-					        - Designed to be globally consistent ±1m
-					        - ETRS89 is a high-accuracy "realisation" of WGS 84, used for surveying in Europe
-				    </script>
-				    </section>
-				    <section data-markdown data-state='noborder'>
-					Of course, the UK has no interest in these fripperies
-				    </script>
-				    </section>
-				    <section data-markdown data-state='noborder'>
-				    <script type="text/template">
+                            - **Coordinate system**: describes how the coordinates are expressed
+                                - Cartesian (x, y, z)
+                                - Ellipsoidal ($\lambda, \mu, \nu$)
+                                - Projected coordinates (UTM: 13.38891º E, 52.51690º N)
+                    </script>
+                    </section>
+                    <section data-markdown data-state='noborder'>
+                    <script type="text/template">
+                            ### WGS 84 
+                            - US-led, but now a global system
+                            - Datum specifies an origin at the centre of the earth
+                            - Uses the WGS 84 ellipsoid
+                            - Position within WGS 84 is determined using GPS
+                            - Designed to be globally consistent ±1m
+                            - ETRS89 is a high-accuracy "realisation" of WGS 84, used for surveying in Europe
+                    </script>
+                    </section>
+                    <section data-markdown data-state='noborder'>
+                    Of course, the UK has no interest in these fripperies
+                    </script>
+                    </section>
+                    <section data-markdown data-state='noborder'>
+                    <script type="text/template">
 ### The "National Grid"
 - Used on UK maps
 - Also used in Shape Files
 - Based on OSGB36 datum
 - Uses an ellipsoid known as **Airy 1830** 💨
-	- (It's actually named after Sir George Biddell Airy KCB PRS)
+    - (It's actually named after Sir George Biddell Airy KCB PRS)
     - It's a better fit for Britain than WGS 84, because it fits the local sea level more accurately 🌊
 - On maps, it uses Easting and Northing coordinates
-				    </script>
-				    </section>
-				    <section data-markdown data-state='noborder'>
-				    <script type="text/template">
+                    </script>
+                    </section>
+                    <section data-markdown data-state='noborder'>
+                    <script type="text/template">
 ## Transforming Between Coordinate Systems
 ### The Helmert Transform
 Datums can differ in three ways:
@@ -176,28 +176,28 @@ Datums can differ in three ways:
 1. Position of the origin of coordinates
 2. Orientation of the coordinate axes (and hence of the reference ellipsoid)
 3. Size and shape of the reference ellipsoid
-				    </script>
-				    </section>
-				    <section data-markdown data-state='noborder'>
-				    <script type="text/template">
+                    </script>
+                    </section>
+                    <section data-markdown data-state='noborder'>
+                    <script type="text/template">
 ## Transforming Between Coordinate Systems, II
 - If you work in 3D cartesian coordinates, you don't have to worry about (3)
 - It's straightforward to carry out this conversion
 - Just trust me on this
-				    </script>
-				    </section>
-				    <section data-markdown data-state='noborder'>
-				    <script type="text/template">
+                    </script>
+                    </section>
+                    <section data-markdown data-state='noborder'>
+                    <script type="text/template">
 ## Transforming Between Coordinate Systems, III
 We use six parameters to describe the difference between two datums:
 - Three parameters to describe a 3D translation between the coordinate origins
 - Three parameters to describe a 3D rotation between the orientations of the coordinate axes.
 
 This can be expressed as a linear formula which assumes that the rotation parameters are ‘small’
-				    </script>
-				    </section>
-				    <section data-markdown data-state='noborder'>
-				    <script type="text/template">
+                    </script>
+                    </section>
+                    <section data-markdown data-state='noborder'>
+                    <script type="text/template">
 ## omgmatrices
 $
 \begin{bmatrix}
@@ -230,59 +230,59 @@ Where:
 - $s$ is the scale factor (unitless) minus one.
 
 (there are no more mathematical formulæ in this talk, fyi)
-				    </script>
-				    </section>
-				    <section data-markdown data-state='noborder'>
-				    <script type="text/template">
+                    </script>
+                    </section>
+                    <section data-markdown data-state='noborder'>
+                    <script type="text/template">
 <!-- Of course, we know that these are…theories   -->
 [![Flat](assets/flat.png)]()
-				    </script>
-				    </section>
-				    <section data-markdown data-state='noborder'>
-				    <script type="text/template">
-					        ### So we're done here?
-					        Well, no.
-					        …the Helmert transform introduces horizontal error up to 3m.  
-					        (we're not really worried about height)  
+                    </script>
+                    </section>
+                    <section data-markdown data-state='noborder'>
+                    <script type="text/template">
+                            ### So we're done here?
+                            Well, no.
+                            …the Helmert transform introduces horizontal error up to 3m.  
+                            (we're not really worried about height)  
 
-					        This is OK, but no use for accurate applications like surveying.
-					        These demand transformations accurate to around 0.1m
-				    </script>
-				    </section>
-				    <section data-markdown data-state='noborder'>
-				    <script type="text/template">
+                            This is OK, but no use for accurate applications like surveying.
+                            These demand transformations accurate to around 0.1m
+                    </script>
+                    </section>
+                    <section data-markdown data-state='noborder'>
+                    <script type="text/template">
 ### Thankfully, UK Ordnance Survey Has Got This
 #### The OSTN02™ and OSTN15™ transforms
 - "Rubber-sheet" transforms
 - Use a file of grid shift parameters with 1km resolution
 - Bilinear interpolation to get precise adjustments
 - OSTN15 is the latest version, it launched about a week ago 
-				    </script>
-				    </section>
-				    <section data-markdown data-state='noborder'>
-				    <script type="text/template">
-						### Implementing the OSTN02™ / OSTN15™ transform
+                    </script>
+                    </section>
+                    <section data-markdown data-state='noborder'>
+                    <script type="text/template">
+                        ### Implementing the OSTN02™ / OSTN15™ transform
 
-						1. Carry out Helmert Transform
-							- (WGS84 Lon, Lat ➡️ ETRS89 Eastings and Northings)
-							- This introduces some positional error into the coordinate
-						2. Retrieve grid shift parameters for the relevant kilometer grid
-						3. Bilinear interpolation to determine precise corrections to apply
-						4. Addition of these produces the shift from the GRS80 to the Airy 1830 Ellipsoid
-						5. We're pretty much done
-				    </script>
-				    </section>
-			    </section>
-			    <section>
-				    <section data-markdown data-state='noborder'>
-				    <script type="text/template">
-				        ### Getting Started
-				        - I have no idea how FFI works in Rust
-				        - I asked on SO, outlining my (terrible, btw) design
-				    </script>
-				    </section>
-				    <section data-markdown data-state='noborder'>
-				    <script type="text/template">
+                        1. Carry out Helmert Transform
+                            - (WGS84 Lon, Lat ➡️ ETRS89 Eastings and Northings)
+                            - This introduces some positional error into the coordinate
+                        2. Retrieve grid shift parameters for the relevant kilometer grid
+                        3. Bilinear interpolation to determine precise corrections to apply
+                        4. Addition of these produces the shift from the GRS80 to the Airy 1830 Ellipsoid
+                        5. We're pretty much done
+                    </script>
+                    </section>
+                </section>
+                <section>
+                    <section data-markdown data-state='noborder'>
+                    <script type="text/template">
+                        ### Getting Started
+                        - I have no idea how FFI works in Rust
+                        - I asked on SO, outlining my (terrible, btw) design
+                    </script>
+                    </section>
+                    <section data-markdown data-state='noborder'>
+                    <script type="text/template">
 ### FFI
 ```rust
 #[repr(C)]
@@ -295,10 +295,6 @@ impl Array {
     unsafe fn as_f32_slice(&self) -> &[f32] {
         assert!(!self.data.is_null());
         slice::from_raw_parts(self.data as *const f32, self.len as usize)
-    }
-    unsafe fn as_i32_slice(&self) -> &[i32] {
-        assert!(!self.data.is_null());
-        slice::from_raw_parts(self.data as *const i32, self.len as usize)
     }
 
     fn from_vec<T>(mut vec: Vec<T>) -> Array {
@@ -322,69 +318,69 @@ pub extern fn drop_array(p: *const Array) {
     unsafe { drop(p) };
 }
 ```
-				    </script>
-				    </section>
-				    <section data-markdown data-state='noborder'>
-				    <script type="text/template">
-				        ### Implementing the transform
-				        - This was…really easy?
-				        - Almost nothing Rust-specific
-				        	1. A series of arithmetic and trig operations
-				        	2. Lookup and addition of adjustments
-				        
-				        `conversions.rs`, L284–373
-				    </script>
-				    </section>
-				    <section data-markdown data-state='noborder'>
-				    <script type="text/template">
-				        ### Checking for floating-point instability
-				        Use Herbie!
-				        - Developed as a standalone tool by UW
-				        - Implemented as a compiler plugin, so you'll need Nightly
-				        - It doesn't just find problems, it suggests improvements!
+                    </script>
+                    </section>
+                    <section data-markdown data-state='noborder'>
+                    <script type="text/template">
+                        ### Implementing the transform
+                        - This was…really easy?
+                        - Almost nothing Rust-specific
+                            1. A series of arithmetic and trig operations
+                            2. Lookup and addition of adjustments
+                        
+                        `conversions.rs`, L284–373
+                    </script>
+                    </section>
+                    <section data-markdown data-state='noborder'>
+                    <script type="text/template">
+                        ### Checking for floating-point instability
+                        Use Herbie!
+                        - Developed as a standalone tool by UW
+                        - Implemented as a compiler plugin, so you'll need Nightly
+                        - It doesn't just find problems, it suggests improvements!
 
-				        https://github.com/mcarton/rust-herbie-lint
-				    </script>
-				    </section>
-				    <section data-markdown data-state='noborder' style="text-align: left;">
-				    <script type="text/template">
+                        https://github.com/mcarton/rust-herbie-lint
+                    </script>
+                    </section>
+                    <section data-markdown data-state='noborder' style="text-align: left;">
+                    <script type="text/template">
 ### Integrating the adjustments
 There's just one problem: there are 876,951 adjustments.  
 
 Each adjustment is a set of three floating-point values.  
 
 They're in a SQLite DB  
-				    </script>
-				    </section>
-				    <section data-markdown data-state='noborder'>
-				    <script type="text/template">
+                    </script>
+                    </section>
+                    <section data-markdown data-state='noborder'>
+                    <script type="text/template">
 ### PHF
 - A compile-time static map
 - Copy and adapt the `PHF` example
-	- Get all the records using `rusqlite`
-	- Key is an `i32`, value is `(f64, f64, f64)`
+    - Get all the records using `rusqlite`
+    - Key is an `i32`, value is `(f64, f64, f64)`
 - It takes a long time to build
 - It also takes a long time to compile
-	- Split it into a separate crate, add it to `Cargo.toml`
-	- Never worry about it again
-				    </script>
-				    </section>
-				    <section data-markdown data-state='noborder'>
-				    <script type="text/template">
-				        ## I Want This To Be Fast 
-				    </script>
-				    </section>
+    - Split it into a separate crate, add it to `Cargo.toml`
+    - Never worry about it again
+                    </script>
+                    </section>
+                    <section data-markdown data-state='noborder'>
+                    <script type="text/template">
+                        ## I Want This To Be Fast 
+                    </script>
+                    </section>
 
-				    <section data-markdown data-state='noborder'>
-				    <script type="text/template">
+                    <section data-markdown data-state='noborder'>
+                    <script type="text/template">
 ### First Attempt at Threading
 ```rust
 #[no_mangle]
-pub extern "C" fn convert_thr(eastings: Array, northings: Array) -> Array {
-    let lon = unsafe { eastings.as_i32_slice() };
-    let lat = unsafe { northings.as_i32_slice() };
+pub extern "C" fn conv_thr(eastings: Array, northings: Array) -> Array {
+    let lon = unsafe { eastings.as_f32_slice() };
+    let lat = unsafe { northings.as_f32_slice() };
     // copy values and combine
-    let orig: Vec<(i32, i32)> = lon.iter()
+    let orig: Vec<(f32, f32)> = lon.iter()
         .cloned()
         .zip(lat.iter()
             .cloned())
@@ -421,10 +417,10 @@ pub extern "C" fn convert_thr(eastings: Array, northings: Array) -> Array {
     Array::from_vec(result)
 }
 ```
-				    </script>
-				    </section>
-				    <section data-markdown data-state='noborder'>
-				    <script type="text/template">
+                    </script>
+                    </section>
+                    <section data-markdown data-state='noborder'>
+                    <script type="text/template">
 ### This is…not great;
 - Casting from i32 to f64
 - Cloning slices into a `Vec`
@@ -437,69 +433,69 @@ I mean, the Array are in scope until the end of the call, and they are already u
 > – mathieum
 
 😭😭😭
-				    </script>
-				    </section>
-				    <section data-markdown data-state='noborder'>
-				    <script type="text/template">
+                    </script>
+                    </section>
+                    <section data-markdown data-state='noborder'>
+                    <script type="text/template">
 ### Time for a Re-Think
 The problem, in an abstract sort of way:
 - We've got a sequence of values
 - The **length** of the sequence isn't going to change
 - The **type** of the values isn't going to change
-	- I re-read the spec – you **must** use `f64` values
+    - I re-read the spec – you **must** use `f64` values
 
 **We can use mutable slices**
-				    </script>
-				    </section>
-				    <section data-markdown data-state='noborder'>
-				    <script type="text/template">
+                    </script>
+                    </section>
+                    <section data-markdown data-state='noborder'>
+                    <script type="text/template">
 ### Time for a Re-Think, II
 - Some time has passed, and threading libraries exist now
 - Can we be generic? Yep:
-	- Accept two sequences
-	- And a function which implements the `Send` and `Copy` traits
-	- Zip the sequences, and split the result into mutable chunks
-	- For each chunk, spawn a thread
-		- In each thread, apply the conversion function to the chunk
-		- Join them up again at the end
+    - Accept two sequences of mutably-borrowed `f64`
+        - Sequences contain longitude and latitude values 
+    - And a function which implements the `Send` and `Copy` traits
+    - Zip the sequences, and split the result into mutable chunks
+        - Chunks contain coordinate tuples: a lon and a lat value
+    - For each chunk, spawn a thread
+        - In each thread, apply the conversion function to each chunk element
+                    </script>
+                    </section>
+                    <section data-markdown data-state='noborder'>
+                    <script type="text/template">
+                            ### Interlude
+                            I didn't realise that `chunks()` / `chunks_mut()` returned slices
+                            - It took *days* to get the syntax correct
+                            - Andrew Hobden's **"Reading Rust Function Signatures"** was incredibly helpful
+                    </script>
+                    </section>
+                    <section data-markdown data-state='noborder'>
+                    <script type="text/template">
+                            ### Interlude II
+                            [![Transforms](assets/notebook.png)]()
 
-				    </script>
-				    </section>
-				    <section data-markdown data-state='noborder'>
-				    <script type="text/template">
-					        ### Interlude
-					        I didn't realise that `chunks()` / `chunks_mut()` returned slices
-					        - It took *days* to get the syntax correct
-					        - Andrew Hobden's **"Reading Rust Function Signatures"** was incredibly helpful
-				    </script>
-				    </section>
-				    <section data-markdown data-state='noborder'>
-				    <script type="text/template">
-					        ### Interlude II
-					        [![Transforms](assets/notebook.png)]()
+                            (This didn't work, but I was on the right track)
 
-					        (This didn't work, but I was on the right track)
-
-				    </script>
-				    </section>
-				    <section data-markdown data-state='noborder'>
-				    <script type="text/template">
-					        ### Interlude III
-					        - I thought the docs could be clearer about this
-					        - So I opened an issue
-					        	- Had a reasonable conversation about doc clarity
-					        	- And then I sent a PR, (which altered 2 words)
-					        - And it was merged! (thanks @steveklabnik)
-				    </script>
-				    </section>
-					<section data-markdown data-state='noborder'>
-				    <script type="text/template">
+                    </script>
+                    </section>
+                    <section data-markdown data-state='noborder'>
+                    <script type="text/template">
+                            ### Interlude III
+                            - I thought the docs could be clearer about this
+                            - So I opened an issue
+                                - Had a reasonable conversation about doc clarity
+                                - And then I sent a PR, (which altered 2 words)
+                            - And it was merged! (thanks @steveklabnik)
+                    </script>
+                    </section>
+                    <section data-markdown data-state='noborder'>
+                    <script type="text/template">
 ### Crossbeam
 ```rust
-fn convert_vec_direct<'a, F>(ex: &'a mut [f64],
-                             ny: &'a mut [f64],
-                             func: F)
-                             -> (&'a mut [f64], &'a mut [f64])
+fn convert_direct<'a, F>(ex: &'a mut [f64],
+                         ny: &'a mut [f64],
+                         func: F)
+                         -> (&'a mut [f64], &'a mut [f64])
     where F: Fn(&f64, &f64) -> Result<(f64, f64), ()> + Send + Copy
 {
     let numthreads = num_cpus::get() as usize;
@@ -531,16 +527,16 @@ fn convert_vec_direct<'a, F>(ex: &'a mut [f64],
     (ex, ny)
 }
 ```
-					</script>
-				    </section>
-				    <section data-markdown data-state='noborder'>
-				    <script type="text/template">
+                    </script>
+                    </section>
+                    <section data-markdown data-state='noborder'>
+                    <script type="text/template">
 ### Rayon
 ```rust
-fn convert_vec_direct<'a, F>(ex: &'a mut [f64],
-                             ny: &'a mut [f64],
-                             func: F)
-                             -> (&'a mut [f64], &'a mut [f64])
+fn convert_direct<'a, F>(ex: &'a mut [f64],
+                         ny: &'a mut [f64],
+                         func: F)
+                         -> (&'a mut [f64], &'a mut [f64])
     where F: Fn(&f64, &f64) -> Result<(f64, f64), ()> + Send + Copy
 {
     ex.par_iter_mut().zip(ny.par_iter_mut()).for_each(|p| {
@@ -559,95 +555,95 @@ fn convert_vec_direct<'a, F>(ex: &'a mut [f64],
     (ex, ny)
 }
 ```
-				    </script>
-				    </section>
-				    <section data-markdown data-state='noborder'>
-				    <script type="text/template">
+                    </script>
+                    </section>
+                    <section data-markdown data-state='noborder'>
+                    <script type="text/template">
 - We need a lifetime specifier because we're returning borrowed values
 - I used a separate specifier for each slice at first
     - It turns out that a single specifier suffices
-				    </script>
-				    </section>
-				    <section data-markdown data-state='noborder' data-background-color="white">
-				    <script type="text/template">
-					        ## Comparing Crossbeam and Rayon
-					        [![Compare](assets/crossbeam_v_rayon.png)]()
-				    </script>
-				    </section>
-			    </section>
-				<section>
-				    <section data-markdown data-state='noborder'>
-				    <script type="text/template">
-					        ### Building Python Wheels
-				    </script>
-				    </section>
-				    <section data-markdown data-state='noborder'>
-				    <script type="text/template">
-					        ## Using Rust-everywhere
+                    </script>
+                    </section>
+                    <section data-markdown data-state='noborder' data-background-color="white">
+                    <script type="text/template">
+                            ## Comparing Crossbeam and Rayon
+                            [![Compare](assets/crossbeam_v_rayon.png)]()
+                    </script>
+                    </section>
+                </section>
+                <section>
+                    <section data-markdown data-state='noborder'>
+                    <script type="text/template">
+                            ### Building Python Wheels
+                    </script>
+                    </section>
+                    <section data-markdown data-state='noborder'>
+                    <script type="text/template">
+                            ## Using Rust-everywhere
 - Essential if you want to support Linux, OSX, and Windows
 - Straightforward to adapt your own needs, if your own needs are:
-	- Run tests
-	- If some condition is true, build artifacts and publish them as GitHub releases
-	- It can integrate bits of `travis-cargo` if you want coverage, separate doc builds
+    - Run tests
+    - If some condition is true, build artifacts and publish them as GitHub releases
+    - It can integrate bits of `travis-cargo` if you want coverage, separate doc builds
 - What I did:
-	- Build Rust libs for all platforms when a tag is pushed, and publish to GH
-	- Build script in my Python package pulls latest release from GH as part of my CI setup
-	- Works on Travis and Appveyor
-				    </script>
-				    </section>
-				    <section data-markdown data-state='noborder'>
-				    <script type="text/template">
-					        ## Difficulties and Gotchas
+    - Build Rust libs for all platforms when a tag is pushed, and publish to GH
+    - Build script in my Python package pulls latest release from GH as part of my CI setup
+    - Works on Travis and Appveyor
+                    </script>
+                    </section>
+                    <section data-markdown data-state='noborder'>
+                    <script type="text/template">
+                            ## Difficulties and Gotchas
 - `setup.py` is **THE WORST THING EVER**
 - For Cython, it incorporates compiler and linker arguments
-	- these are completely different for each platform
-	- 😭😭😭
-				    </script>
-				    </section>
-				    <section data-markdown data-state='noborder'>
-				    <script type="text/template">
-					        ## `manylinux1`
+    - these are completely different for each platform
+    - 😭😭😭
+                    </script>
+                    </section>
+                    <section data-markdown data-state='noborder'>
+                    <script type="text/template">
+                            ## `manylinux1`
 - The official Linux build for widely-compatible Python wheels
 - It's available as a docker image
 - If you want a `manylinux1`-compatible dylib (and you do), you have to build using it
-				    </script>
-				    </section>
-				    <section data-markdown data-state='noborder'>
-				    <script type="text/template">
-					        ## Mingwpy
+                    </script>
+                    </section>
+                    <section data-markdown data-state='noborder'>
+                    <script type="text/template">
+                            ## Mingwpy
 - Based on the `mingw-w64` gcc compilers
 - Not available for Python 3.5 yet
-				    </script>
-				    </section>
-				    <section data-markdown data-state='noborder' style="text-align: left;">
-				    <script type="text/template">
-					        ## OSX
+                    </script>
+                    </section>
+                    <section data-markdown data-state='noborder' style="text-align: left;">
+                    <script type="text/template">
+                            ## OSX
 Lots of excellent build scripts:
 
 https://github.com/matthew-brett/multibuild
-				    </script>
-				    </section>
-			    </section>
-				<section>
-					<section data-markdown>
-				    <script type="text/template">
-					### Benchmarking `convertbng`
-					- Generate 10m random WGS84 points within the GLA boundary <!-- .element: class="fragment" data-fragment-index="1" -->
-					- Convert them to OSGB36 <!-- .element: class="fragment" data-fragment-index="2" -->
-					</script>
-					</section>
-					<section data-markdown>
-				    <script type="text/template">
-					### Benchmarking `convertbng`
-					Methodology
-					- 4 Amazon EC2 C4 (compute-optimised) systems were tested
-					- The system was calibrated by taking the mean of 5 calibration runs of 1m random numbers
-					- An identical benchmark program was then run for each of the 3 configurations
-					</script>
-					</section>
-					<section data-markdown>
-				    <script type="text/template">
-	## Results
+                    </script>
+                    </section>
+                </section>
+                <section>
+                    <section data-markdown>
+                    <script type="text/template">
+                    ### Benchmarking `convertbng`
+                    - Generate 10m random WGS84 points within the GLA boundary <!-- .element: class="fragment" data-fragment-index="1" -->
+                    - Convert them to OSGB36 <!-- .element: class="fragment" data-fragment-index="2" -->
+                    </script>
+                    </section>
+                    <section data-markdown>
+                    <script type="text/template">
+                    ### Benchmarking `convertbng`
+                    Methodology
+                    - 4 Amazon EC2 C4 (compute-optimised) systems were tested
+                    - The system was calibrated by taking the mean of 5 calibration runs of 1m random numbers
+                    - An identical benchmark program was then run for each of the 3 configurations
+                    </script>
+                    </section>
+                    <section data-markdown>
+                    <script type="text/template">
+## Results
 | EC2 Instance Type    | Processors (vCPU) | Rust Ctypes (s) | Rust Cython (s) | Pyproj (s) | Ctypes vs Pyproj | Cython vs Pyproj |
 |:----------|:----------:|:----------:|:----------:|:----------:|:----------:|----------:|
 | c4.xlarge            | 4                 | 14.782          | 11.714          |  9.379     |   58.36%         |   24.97%         |
@@ -655,80 +651,80 @@ https://github.com/matthew-brett/multibuild
 | c4.4xlarge           | 16                | 6.470           | 3.716           |  9.398     |  -31.49%         |  -60.25%         |
 | c4.8xlarge           | 36                | 4.913           | 2.501           |  9.308     |  -48.05%         |  -73.35%         |
 
-					</script>
-					</section>
-				</section>
-				<section data-markdown>
-			    <script type="text/template">
-				### What next for Geospatial Computing using Rust?
-				- Geo-rust exists
-				- Under active development
-					- Aims to provide a subset of geospatial primitives (think GEOS), in the first instance
-						- Point, LineString, Polygon types, and their Multi– versions
-						- Distance calculation algorithms, and predicates (`contains` etc.)
-						- Geometry simplification (RDP)
-				- Related libraries (GeoJSON, WKT, GPX, Geohash, Shapefile, Polyline) are all stable / under active development
-				- There aren't enough of us
-				</script>
-				</section>
-				<section data-markdown>
-			    <script type="text/template">
-				### This talk
-				- It's all true
-				- I haven't talked about the community much
-				- It's probably the most important part
-				</script>
-				</section>
-				<section data-markdown>
-			    <script type="text/template">
-				- Some parts of learning Rust are really, really difficult
-				- The community is helpful
-					- but it's also supportive, and encouraging
-				- Watching you helping people, and being kind to one another, is what keeps me writing Rust
-				- The Rust community isn't a socio-technical system (cities aren't, either)
-					- They're spaces in which kindness reveals itself in unexpected places
-				</script>
-				</section>
-				<section data-markdown>
-			    <script type="text/template">
-				## Thank You. Questions?
-				- Me: @urschrei on Twitter / Github
-				- `lonlat_bng`: https://github.com/lonlat_bng
-				- `convertbng`: https://github.com/convertbng
-				- [Reading Rust Function Signatures](https://hoverbear.org/2015/07/10/reading-rust-function-signatures)
-				- [A Guide to Coordinate Systems in Great Britain](https://www.ordnancesurvey.co.uk/docs/support/guide-coordinate-systems-great-britain.pdf)
-				- Rust-geo: https://github.com/georust/rust-geo
-				- Logo of the 2013 Flat Earth Society
-					- Source: http://wiki.tfes.org/File:Flat_Earth_Society_Logo.png
-					- License: CC BY-SA 4.0
-				</script>
-				</section>
-			</div>
-		</div>
-		<script src="lib/js/head.min.js"></script>
-		<script src="js/reveal.js"></script>
+                    </script>
+                    </section>
+                </section>
+                <section data-markdown>
+                <script type="text/template">
+                ### What next for Geospatial Computing using Rust?
+                - Geo-rust exists
+                - Under active development
+                    - Aims to provide a subset of geospatial primitives (think GEOS), in the first instance
+                        - Point, LineString, Polygon types, and their Multi– versions
+                        - Distance calculation algorithms, and predicates (`contains` etc.)
+                        - Geometry simplification (RDP)
+                - Related libraries (GeoJSON, WKT, GPX, Geohash, Shapefile, Polyline) are all stable / under active development
+                - There aren't enough of us
+                </script>
+                </section>
+                <section data-markdown>
+                <script type="text/template">
+                ### This talk
+                - It's all true
+                - I haven't talked about the community much
+                - It's probably the most important part
+                </script>
+                </section>
+                <section data-markdown>
+                <script type="text/template">
+                - Some parts of learning Rust are really, really difficult<!-- .element: class="fragment" data-fragment-index="1" -->
+                - The community is helpful<!-- .element: class="fragment" data-fragment-index="1" -->
+                    - but it's also supportive, and encouraging<!-- .element: class="fragment" data-fragment-index="2" -->
+                - Watching you helping people, and being kind to one another, is what keeps me writing Rust<!-- .element: class="fragment" data-fragment-index="3" -->
+                - The Rust community isn't a socio-technical system (cities aren't, either)<!-- .element: class="fragment" data-fragment-index="4" -->
+                    - They're spaces in which kindness reveals itself in unexpected places<!-- .element: class="fragment" data-fragment-index="5" -->
+                </script>
+                </section>
+                <section data-markdown>
+                <script type="text/template">
+                ## Thank You. Questions?
+                - Me: @urschrei on Twitter / Github
+                - `lonlat_bng`: https://github.com/lonlat_bng
+                - `convertbng`: https://github.com/convertbng
+                - [Reading Rust Function Signatures](https://hoverbear.org/2015/07/10/reading-rust-function-signatures)
+                - [A Guide to Coordinate Systems in Great Britain](https://www.ordnancesurvey.co.uk/docs/support/guide-coordinate-systems-great-britain.pdf)
+                - Rust-geo: https://github.com/georust/rust-geo
+                - Logo of the 2013 Flat Earth Society
+                    - Source: http://wiki.tfes.org/File:Flat_Earth_Society_Logo.png
+                    - License: CC BY-SA 4.0
+                </script>
+                </section>
+            </div>
+        </div>
+        <script src="lib/js/head.min.js"></script>
+        <script src="js/reveal.js"></script>
 
-		<script>
-			// More info https://github.com/hakimel/reveal.js#configuration
-			Reveal.initialize({
-				history: true,
-				center: true,
-				transition: 'convex',
-			    math: {
-			        mathjax: 'https://cdn.mathjax.org/mathjax/latest/MathJax.js',
-			        config: 'TeX-AMS-MML_HTMLorMML'  // See http://docs.mathjax.org/en/latest/config-files.html
-			    },
+        <script>
+            // More info https://github.com/hakimel/reveal.js#configuration
+            Reveal.initialize({
+                history: true,
+                center: true,
+                transition: 'convex',
+                math: {
+                    mathjax: 'https://cdn.mathjax.org/mathjax/latest/MathJax.js',
+                    config: 'TeX-AMS-MML_HTMLorMML'  // See http://docs.mathjax.org/en/latest/config-files.html
+                },
 
-				// More info https://github.com/hakimel/reveal.js#dependencies
-				dependencies: [
-					{ src: 'plugin/zoom-js/zoom.js', async: true },
-					{ src: 'plugin/math/math.js', async: true },
-					{ src: 'plugin/markdown/marked.js' },
-					{ src: 'plugin/markdown/markdown.js' },
-					{ src: 'plugin/notes/notes.js', async: true },
-					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
-				]
-			});
-		</script>
-	</body>
+                // More info https://github.com/hakimel/reveal.js#dependencies
+                dependencies: [
+                    { src: 'plugin/zoom-js/zoom.js', async: true },
+                    { src: 'plugin/math/math.js', async: true },
+                    { src: 'plugin/markdown/marked.js' },
+                    { src: 'plugin/markdown/markdown.js' },
+                    { src: 'plugin/notes/notes.js', async: true },
+                    { src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+                ]
+            });
+        </script>
+    </body>
 </html>
