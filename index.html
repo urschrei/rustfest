@@ -14,7 +14,7 @@
         <link rel="stylesheet" href="css/custom.css">
 
         <!-- Theme used for syntax highlighting of code -->
-        <link rel="stylesheet" href="lib/css/monokai-sublime.css">
+        <link rel="stylesheet" href="lib/css/solarized-dark.css">
 
         <!-- Printing and PDF exports -->
         <script>
@@ -28,8 +28,6 @@
     <body>
         <div class="reveal">
             <div class="slides">
-                <!-- <section>Slide 1</section> -->
-                <!-- <section>Slide 2</section> -->
                 <section data-markdown style="text-align: left;">
                 <script type="text/template">
                         ## Teaching Myself Rust via the medium of Coordinate System Transforms
@@ -74,10 +72,10 @@
                     [![Transforms](assets/isochrone.png)]()
                     </script>
                     </section>
-                    <section data-background-video="assets/tweetcity.mp4" data-background-video-loop data-background-video-muted>
+<!--                     <section data-background-video="assets/tweetcity.mp4" data-background-video-loop data-background-video-muted>
                     <script type="text/template">
                     </script>
-                    </section>
+                    </section> -->
                 </section>
                     <section data-markdown data-state='noborder'>
                     <script type="text/template">
@@ -131,7 +129,6 @@ Rusty.  <!-- .element: class="fragment" data-fragment-index="2" -->
                             - **Datum**: describes how the CRS is related to the earth
                                 - Position of the origin
                                 - Scale
-                                - **Surface**
                                 - **Geoid**
 
                             - **Coordinate system**: describes how the coordinates are expressed
@@ -234,7 +231,6 @@ Where:
                     </section>
                     <section data-markdown data-state='noborder'>
                     <script type="text/template">
-<!-- Of course, we know that these are…theories   -->
 [![Flat](assets/flat.png)]()
                     </script>
                     </section>
@@ -246,7 +242,8 @@ Where:
                             (we're not really worried about height)  
 
                             This is OK, but no use for accurate applications like surveying.
-                            These demand transformations accurate to around 0.1m
+                            These demand transformations accurate to around 0.001m
+                            (handheld GPS only gives ~15m, differential GPS is 0.1m)
                     </script>
                     </section>
                     <section data-markdown data-state='noborder'>
@@ -269,7 +266,7 @@ Where:
                         2. Retrieve grid shift parameters for the relevant kilometer grid
                         3. Bilinear interpolation to determine precise corrections to apply
                         4. Addition of these produces the shift from the GRS80 to the Airy 1830 Ellipsoid
-                        5. We're pretty much done
+                        5. NOW we're done
                     </script>
                     </section>
                 </section>
@@ -291,6 +288,12 @@ pub struct Array {
     len: libc::size_t,
 }
 
+#[repr(C)]
+pub struct FloatTuple {
+    a: c_float,
+    b: c_float,
+}
+
 impl Array {
     unsafe fn as_f32_slice(&self) -> &[f32] {
         assert!(!self.data.is_null());
@@ -298,15 +301,13 @@ impl Array {
     }
 
     fn from_vec<T>(mut vec: Vec<T>) -> Array {
-        // Important to make length and capacity match
-        // A better solution is to track both length and capacity
+        // Make length and capacity match
         vec.shrink_to_fit();
         let array = Array {
             data: vec.as_ptr() as *const libc::c_void,
             len: vec.len() as libc::size_t
         };
-        // Whee! Leak the memory, and now the raw pointer (and
-        // eventually C) is the owner.
+        // Leak the memory, and now the raw pointer is the owner.
         mem::forget(vec);
         array
     }
@@ -325,10 +326,10 @@ pub extern fn drop_array(p: *const Array) {
                         ### Implementing the transform
                         - This was…really easy?
                         - Almost nothing Rust-specific
-                            1. A series of arithmetic and trig operations
-                            2. Lookup and addition of adjustments
-                        
-                        `conversions.rs`, L284–373
+                            1. Coordinate bounds check
+                            2. A series of arithmetic and trig operations
+                            3. Lookup and addition of adjustments
+                            4. If anything goes wrong, return a `NAN` value
                     </script>
                     </section>
                     <section data-markdown data-state='noborder'>
@@ -376,13 +377,13 @@ They're in a SQLite DB
 ### First Attempt at Threading
 ```rust
 #[no_mangle]
-pub extern "C" fn conv_thr(eastings: Array, northings: Array) -> Array {
-    let lon = unsafe { eastings.as_f32_slice() };
-    let lat = unsafe { northings.as_f32_slice() };
+pub extern "C" fn conv_thr(lons: Array, lats: Array) -> Array {
+    let lon_sl = unsafe { eastings.as_f32_slice() };
+    let lat_sl = unsafe { northings.as_f32_slice() };
     // copy values and combine
-    let orig: Vec<(f32, f32)> = lon.iter()
+    let orig: Vec<(f32, f32)> = lon_sl.iter()
         .cloned()
-        .zip(lat.iter()
+        .zip(lat_sl.iter()
             .cloned())
         .collect();
     let mut guards: Vec<JoinHandle<Vec<(f64, f64)>>> = vec![];
@@ -422,7 +423,8 @@ pub extern "C" fn conv_thr(eastings: Array, northings: Array) -> Array {
                     <section data-markdown data-state='noborder'>
                     <script type="text/template">
 ### This is…not great;
-- Casting from i32 to f64
+- Hard-coded number of threads
+- Casting back and forth between `f32` and `f64`
 - Cloning slices into a `Vec`
 - Calling `to_owned()` allocates again
 - Is this an `unwrap()` I see before me?
@@ -463,6 +465,18 @@ The problem, in an abstract sort of way:
                     </section>
                     <section data-markdown data-state='noborder'>
                     <script type="text/template">
+### Time for a Re-Think, III
+- We can define a wrapper function for each type of conversion
+    - We can then define an FFI function to wrap each of these
+- Code can now be moved into modules
+    - `conversions`, where all the conversion functions live
+    - `ffi`, where the externally-exposed functions live
+    - `lib`, where the top-level wrappers and the generic function live
+    - `utilities`, for rounding methods etc.
+                    </script>
+                    </section>
+                    <section data-markdown data-state='noborder'>
+                    <script type="text/template">
                             ### Interlude
                             I didn't realise that `chunks()` / `chunks_mut()` returned slices
                             - It took *days* to get the syntax correct
@@ -475,7 +489,6 @@ The problem, in an abstract sort of way:
                             [![Transforms](assets/notebook.png)]()
 
                             (This didn't work, but I was on the right track)
-
                     </script>
                     </section>
                     <section data-markdown data-state='noborder'>
@@ -579,6 +592,45 @@ fn convert_direct<'a, F>(ex: &'a mut [f64],
                     </section>
                     <section data-markdown data-state='noborder'>
                     <script type="text/template">
+```python
+cdef ffi_wrapper(_Result_Tuple (*func)(_FFIArray, _FFIArray)):
+    """ Accepts a function pointer and two arguments
+            longitudes
+            latitudes
+    These must be memory-contiguous Python arrays
+    The function pointer must map to an FFI Rust function
+    """
+    def wrapped(inlon, inlat):
+        # Assumes that the data is double, not float. This is easily changed
+        # The [::1] promises it's contiguous in memory
+        cdef double[::1] wlon = np.array(inlon, dtype=np.float64)
+        cdef double [::1] wlat = np.array(inlat, dtype=np.float64)
+        cdef _FFIArray x_ffi, y_ffi
+        # get a pointer to the data, and cast it to void*
+        x_ffi.data = <void*>&wlon[0]
+        x_ffi.len = wlon.shape[0]
+        # repeat for lats
+        y_ffi.data = <void*>&wlat[0]
+        y_ffi.len = wlat.shape[0]
+        # call across the FFI boundary
+        cdef _Result_Tuple result = func(x_ffi, y_ffi)
+        # get data pointers for the two result arrays
+        cdef double* eastings_ptr = <double*>(result.e.data)
+        cdef double* northings_ptr = <double*>(result.n.data)
+        # now view the output arrays using memoryviews
+        # their length must be specified
+        cdef double[::1] e = <double[:result.e.len:1]>eastings_ptr
+        cdef double[::1] n = <double[:result.n.len:1]>northings_ptr
+        # create numpy copies of the two arrays
+        e_numpy = np.copy(e)
+        n_numpy = np.copy(n)
+        return e_numpy, n_numpy
+    return wrapped
+```
+                    </script>
+                    </section>
+                    <section data-markdown data-state='noborder'>
+                    <script type="text/template">
                             ## Using Rust-everywhere
 - Essential if you want to support Linux, OSX, and Windows
 - Straightforward to adapt your own needs, if your own needs are:
@@ -594,7 +646,7 @@ fn convert_direct<'a, F>(ex: &'a mut [f64],
                     <section data-markdown data-state='noborder'>
                     <script type="text/template">
                             ## Difficulties and Gotchas
-- `setup.py` is **THE WORST THING EVER**
+- `setup.py` is…difficult to work with
 - For Cython, it incorporates compiler and linker arguments
     - these are completely different for each platform
     - 😭😭😭
@@ -671,8 +723,13 @@ https://github.com/matthew-brett/multibuild
                 <script type="text/template">
                 ### This talk
                 - It's all true
-                - I haven't talked about the community much
-                - It's probably the most important part
+                - But it's also mis-titled 
+                - New, better title
+                </script>
+                </section>
+                <section data-markdown>
+                <script type="text/template">
+                "Learning Rust by Asking a lot of Questions, and Getting Incredibly Helpful Answers from You"
                 </script>
                 </section>
                 <section data-markdown>
@@ -681,8 +738,6 @@ https://github.com/matthew-brett/multibuild
                 - The community is helpful<!-- .element: class="fragment" data-fragment-index="1" -->
                     - but it's also supportive, and encouraging<!-- .element: class="fragment" data-fragment-index="2" -->
                 - Watching you helping people, and being kind to one another, is what keeps me writing Rust<!-- .element: class="fragment" data-fragment-index="3" -->
-                - The Rust community isn't a socio-technical system (cities aren't, either)<!-- .element: class="fragment" data-fragment-index="4" -->
-                    - They're spaces in which kindness reveals itself in unexpected places<!-- .element: class="fragment" data-fragment-index="5" -->
                 </script>
                 </section>
                 <section data-markdown>
@@ -691,11 +746,12 @@ https://github.com/matthew-brett/multibuild
                 - Me: @urschrei on Twitter / Github
                 - `lonlat_bng`: https://github.com/lonlat_bng
                 - `convertbng`: https://github.com/convertbng
-                - [Reading Rust Function Signatures](https://hoverbear.org/2015/07/10/reading-rust-function-signatures)
-                - [A Guide to Coordinate Systems in Great Britain](https://www.ordnancesurvey.co.uk/docs/support/guide-coordinate-systems-great-britain.pdf)
+                - Rust-everywhere: https://github.com/japaric/rust-everywhere
+                - Reading Rust Function Signatures: [goo.gl/ZyyLYP](goo.gl/ZyyLYP)
+                - Guide to Coordinate Systems in Great Britain: [goo.gl/4vMLUP](goo.gl/4vMLUP)
                 - Rust-geo: https://github.com/georust/rust-geo
                 - Logo of the 2013 Flat Earth Society
-                    - Source: http://wiki.tfes.org/File:Flat_Earth_Society_Logo.png
+                    - Source: [goo.gl/3KYhpM](goo.gl/3KYhpM)
                     - License: CC BY-SA 4.0
                 </script>
                 </section>
